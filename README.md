@@ -50,6 +50,18 @@ Command line flags will override values in a config.toml.
 
 ---
 
+## `Matrix`
+
+Sending commands to VB-Audio Matrix is also possible, for example:
+
+```
+vbantxt-cli -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
+```
+
+A documentation of all available Matrix instructions can be found on the [Voicemeeter forum][matrix-commands].
+
+---
+
 ## `Script files`
 
 The vbantxt-cli utility accepts a single string request or an array of string requests. This means you can pass scripts stored in files.
@@ -62,7 +74,7 @@ Or with Bash:
 
 `cat script.txt | xargs vbantxt-cli`
 
-to load commands from a file:
+to load Voicemeeter commands from a file:
 
 ```
 strip[0].mute=1;strip[0].mono=0
@@ -70,17 +82,14 @@ strip[1].mute=0;strip[1].mono=1
 bus[3].eq.On=0
 ```
 
----
-
-## `Matrix`
-
-Sending commands to VB-Audio Matrix is also possible, for example:
+or for Matrix:
 
 ```
-vbantxt-cli -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
+Point(ASIO128.IN[1..4],ASIO128.OUT[1]).dBGain = -3
+Point(ASIO128.IN[1..4],ASIO128.OUT[2]).dBGain = -3
+Point(ASIO128.IN[1..4],ASIO128.OUT[1]).Mute = 1
+Point(ASIO128.IN[1..4],ASIO128.OUT[2]).Mute = 1
 ```
-
-A documentation of all available Matrix instructions can be found on the [Voicemeeter forum][matrix-commands].
 
 ---
 
