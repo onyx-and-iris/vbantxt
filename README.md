@@ -7,14 +7,14 @@ Send Voicemeeter string requests over a network or to Matrix
 
 For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 
-## Tested against
+## `Tested against`
 
 - Basic 1.0.8.4
 - Banana 2.0.6.4
 - Potato 3.0.2.4
 - Matrix 1.0.0.3
 
-## Requirements
+## `Requirements`
 
 - [Voicemeeter](https://voicemeeter.com/) or [Matrix](https://vb-audio.com/Matrix/)
 - Go 1.18 or greater (if you want to compile yourself, otherwise check `Releases`)
@@ -78,12 +78,18 @@ Sending commands to VB-Audio Matrix is also possible, for example:
 vbantxt-cli -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
 ```
 
+A documentation of all available Matrix instructions can be found on the [Voicemeeter forum][matrix-commands].
+
 ---
 
 ## `Logging`
 
-Log level may be set by passing the `-l` flag with a number from 0 up to 6 where
+Pass the `-l` flag with an argument from 0 up to 6.
 
 0 = Panic, 1 = Fatal, 2 = Error, 3 = Warning, 4 = Info, 5 = Debug, 6 = Trace
 
-Log level defaults to Warning level.
+For example, to set the log level to Debug:
+
+`vbantxt-cli.exe -l=5 "strip[0].mute=0"`
+
+[matrix-commands]: https://forum.vb-audio.com/viewtopic.php?t=1883&sid=9802ac9ddd9beff9475611d52a2164ba
