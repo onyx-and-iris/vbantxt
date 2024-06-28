@@ -23,6 +23,12 @@ For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 
 ## `Command Line`
 
+#### Flags
+
+- `host` defaults to "localhost"
+- `port` defaults to 6980
+- `streamname` defaults to "Command1"
+
 Pass `host`, `port` and `streamname` as flags, for example:
 
 ```
@@ -39,10 +45,6 @@ Host="gamepc.local"
 Port=6980
 Streamname="Command1"
 ```
-
-- `host` defaults to "localhost"
-- `port` defaults to 6980
-- `streamname` defaults to "Command1"
 
 Command line flags will override values in a config.toml.
 
