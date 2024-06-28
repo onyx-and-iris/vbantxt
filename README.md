@@ -5,6 +5,8 @@
 
 Send Voicemeeter string requests over a network or to Matrix
 
+For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
+
 ## Tested against
 
 - Basic 1.0.8.4
