@@ -3,7 +3,6 @@ package main
 import (
 	"bytes"
 	"encoding/binary"
-	"errors"
 	"flag"
 	"fmt"
 	"net"
@@ -44,20 +43,9 @@ type (
 	}
 )
 
-func setLogLevel(loglevel int) {
-	switch loglevel {
-	case 0:
-		log.SetLevel(log.WarnLevel)
-	case 1:
-		log.SetLevel(log.InfoLevel)
-	case 2:
-		log.SetLevel(log.DebugLevel)
-	}
-}
-
 func main() {
-	flag.StringVar(&host, "host", "", "vban host")
-	flag.StringVar(&host, "h", "", "vban host (shorthand)")
+	flag.StringVar(&host, "host", "localhost", "vban host")
+	flag.StringVar(&host, "h", "localhost", "vban host (shorthand)")
 	flag.IntVar(&port, "port", 6980, "vban server port")
 	flag.IntVar(&port, "p", 6980, "vban server port (shorthand)")
 	flag.StringVar(&streamname, "streamname", "Command1", "stream name for text requests")
@@ -68,11 +56,13 @@ func main() {
 	flag.IntVar(&channel, "c", 0, "vban channel (shorthand)")
 	flag.IntVar(&delay, "delay", 20, "delay between requests")
 	flag.IntVar(&delay, "d", 20, "delay between requests (shorthand)")
-	flag.IntVar(&loglevel, "loglevel", 0, "log level")
-	flag.IntVar(&loglevel, "l", 0, "log level (shorthand)")
+	flag.IntVar(&loglevel, "loglevel", int(log.WarnLevel), "log level")
+	flag.IntVar(&loglevel, "l", int(log.WarnLevel), "log level (shorthand)")
 	flag.Parse()
 
-	setLogLevel(loglevel)
+	if loglevel >= int(log.PanicLevel) && loglevel <= int(log.TraceLevel) {
+		log.SetLevel(log.Level(loglevel))
+	}
 
 	c, err := vbanConnect()
 	if err != nil {
@@ -84,52 +74,49 @@ func main() {
 	for _, arg := range flag.Args() {
 		err := send(c, header, arg)
 		if err != nil {
-			log.Error(err)
+			log.Error(err.Error())
 		}
 	}
 }
 
 // vbanConnect establishes a VBAN connection to remote host
 func vbanConnect() (*net.UDPConn, error) {
-	if host == "" {
-		conn, err := connFromToml()
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+	f := filepath.Join(homeDir, ".vbantxt_cli", "config.toml")
+	if _, err := os.Stat(f); err == nil {
+		conn, err := connFromToml(f)
 		if err != nil {
 			return nil, err
 		}
-		host = conn.Host
-		port = conn.Port
-		streamname = conn.Streamname
-		if host == "" {
-			err := errors.New("must provide a host with --host flag or config.toml")
-			return nil, err
+		if !isFlagPassed("h") && !isFlagPassed("host") {
+			host = conn.Host
+		}
+		if !isFlagPassed("p") && !isFlagPassed("port") {
+			port = conn.Port
+		}
+		if !isFlagPassed("s") && !isFlagPassed("streamname") {
+			streamname = conn.Streamname
 		}
 	}
-	CONNECT := fmt.Sprintf("%s:%d", host, port)
+	log.Debugf("Using values host: %s port: %d streamname: %s", host, port, streamname)
 
-	s, _ := net.ResolveUDPAddr("udp4", CONNECT)
+	s, _ := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", host, port))
 	c, err := net.DialUDP("udp4", nil, s)
 	if err != nil {
 		return nil, err
 	}
-	log.Info("Connected to ", c.RemoteAddr().String())
+	log.Infof("Connected to %s", c.RemoteAddr())
 
 	return c, nil
 }
 
 // connFromToml parses connection info from config.toml
-func connFromToml() (*connection, error) {
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		log.Fatal(err)
-	}
-	f := filepath.Join(homeDir, ".vbantxt_cli", "config.toml")
-	if _, err := os.Stat(f); err != nil {
-		err := fmt.Errorf("unable to locate %s", f)
-		return nil, err
-	}
-
+func connFromToml(f string) (*connection, error) {
 	var c config
-	_, err = toml.DecodeFile(f, &c.Connection)
+	_, err := toml.DecodeFile(f, &c.Connection)
 	if err != nil {
 		return nil, err
 	}
@@ -139,7 +126,7 @@ func connFromToml() (*connection, error) {
 
 // send sends a VBAN text request over UDP to remote host
 func send(c *net.UDPConn, h *requestHeader, msg string) error {
-	log.Debug("Sending '", msg, "' to: ", c.RemoteAddr().String())
+	log.Debugf("Sending '%s' to: %s", msg, c.RemoteAddr())
 	data := []byte(msg)
 	_, err := c.Write(append(h.header(), data...))
 	if err != nil {
