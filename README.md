@@ -3,18 +3,19 @@
 
 # VBAN Sendtext CLI Utility
 
-Send Voicemeeter string requests over a network.
+Send Voicemeeter string requests over a network or to Matrix
 
 ## Tested against
 
--   Basic 1.0.8.4
--   Banana 2.0.6.4
--   Potato 3.0.2.4
+- Basic 1.0.8.4
+- Banana 2.0.6.4
+- Potato 3.0.2.4
+- Matrix 1.0.0.3
 
 ## Requirements
 
--   [Voicemeeter](https://voicemeeter.com/)
--   Go 1.18 or greater (if you want to compile yourself, otherwise check `Releases`)
+- [Voicemeeter](https://voicemeeter.com/) or [Matrix](https://vb-audio.com/Matrix/)
+- Go 1.18 or greater (if you want to compile yourself, otherwise check `Releases`)
 
 ---
 
@@ -37,6 +38,12 @@ Port=6980
 Streamname="Command1"
 ```
 
+- `host` defaults to "localhost"
+- `port` defaults to 6980
+- `streamname` defaults to "Command1"
+
+Command line flags will override values in a config.toml.
+
 ---
 
 ## `Script files`
@@ -58,3 +65,23 @@ strip[0].mute=1;strip[0].mono=0
 strip[1].mute=0;strip[1].mono=1
 bus[3].eq.On=0
 ```
+
+---
+
+## `Matrix`
+
+Sending commands to VB-Audio Matrix is also possible, for example:
+
+```
+vbantxt-cli -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
+```
+
+---
+
+## `Logging`
+
+Log level may be set by passing the `-l` flag with a number from 0 up to 6 where
+
+0 = Panic, 1 = Fatal, 2 = Error, 3 = Warning, 4 = Info, 5 = Debug, 6 = Trace
+
+Log level defaults to Warning level.
