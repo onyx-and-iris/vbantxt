@@ -1,0 +1,4 @@
+[connection]
+host = "localhost"
+port = 7000
+streamname = "vbantxt"
