@@ -1,0 +1,4 @@
+Point(ASIO128.IN[1..4],ASIO128.OUT[1]).dBGain = -3
+Point(ASIO128.IN[1..4],ASIO128.OUT[2]).dBGain = -3
+Point(ASIO128.IN[1..4],ASIO128.OUT[1]).Mute = 1
+Point(ASIO128.IN[1..4],ASIO128.OUT[2]).Mute = 1

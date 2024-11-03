@@ -1,0 +1,3 @@
+strip[0].mute=1;strip[0].mono=0
+strip[1].mute=0;strip[1].mono=1
+bus[3].eq.On=0
