@@ -17,10 +17,11 @@ func WithRateLimit(ratelimit time.Duration) Option {
 }
 
 // WithBPSOpt is a functional option to set the bps index for {VbanTx}.{Packet}.bpsIndex
-func WithBPSOpt(bpsIndex int) Option {
+func WithBPSOpt(bps int) Option {
 	return func(vt *VbanTxt) {
-		if bpsIndex < 0 || bpsIndex >= len(BpsOpts) {
-			log.Warnf("invalid bpsIndex %d, defaulting to 0", bpsIndex)
+		bpsIndex := indexOf(BpsOpts, bps)
+		if bpsIndex == -1 {
+			log.Warnf("invalid bps value %d, expected one of %v, defaulting to 0", bps, BpsOpts)
 			return
 		}
 		vt.packet.bpsIndex = bpsIndex

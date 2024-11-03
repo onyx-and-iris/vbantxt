@@ -82,12 +82,12 @@ func main() {
 	}
 }
 
-func createClient(host string, port int, streamname string, bps int, channel, ratelimit int) (*vbantxt.VbanTxt, error) {
+func createClient(host string, port int, streamname string, bps, channel, ratelimit int) (*vbantxt.VbanTxt, error) {
 	client, err := vbantxt.New(
 		host,
 		port,
 		streamname,
-		vbantxt.WithBPSOpt(indexOf(vbantxt.BpsOpts, bps)),
+		vbantxt.WithBPSOpt(bps),
 		vbantxt.WithChannel(channel),
 		vbantxt.WithRateLimit(time.Duration(ratelimit)*time.Millisecond))
 	if err != nil {
