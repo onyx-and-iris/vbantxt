@@ -17,6 +17,7 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   `config` flag (shorthand `C`), you may now specify a custom config directory. It defaults to `home directory / .config / vbantxt_cli /`.
     -   please note, the default directory has changed from v0.1.0
+-   Functional options `WithRateLimit` and `WithBPSOpt` and `WithChannel` added. Use them to configure the vbantxt client. See the [included vbantxt cli][vbantxt-cli] for an example of usage.
 
 ### Changed
 
@@ -41,3 +42,5 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   Initial release, package implements VBAN PROTOCOL TXT with a basic CLI for configuring options.
 -   Ability to load configuration settings from a config.toml.
+
+[vbantxt-cli]: https://github.com/onyx-and-iris/vbantxt/blob/main/cmd/vbantxt/main.go
