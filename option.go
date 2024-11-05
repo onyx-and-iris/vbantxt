@@ -16,7 +16,7 @@ func WithRateLimit(ratelimit time.Duration) Option {
 	}
 }
 
-// WithBPSOpt is a functional option to set the bps index for {VbanTx}.{Packet}.bpsIndex
+// WithBPSOpt is a functional option to set the bps index for {VbanTxt}.packet
 func WithBPSOpt(bps int) Option {
 	return func(vt *VbanTxt) {
 		bpsIndex := indexOf(BpsOpts, bps)
@@ -28,7 +28,7 @@ func WithBPSOpt(bps int) Option {
 	}
 }
 
-// WithChannel is a functional option to set the bps index for {VbanTx}.{Packet}.channel
+// WithChannel is a functional option to set the channel for {VbanTxt}.packet
 func WithChannel(channel int) Option {
 	return func(vt *VbanTxt) {
 		vt.packet.channel = channel
