@@ -11,6 +11,12 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
+# [0.2.1] - 2024-11-07
+
+### Fixed
+
+-   {packet}.header() now uses a reusable buffer.
+
 # [0.2.0] - 2024-10-27
 
 ### Added
