@@ -22,7 +22,7 @@ type packet struct {
 	bpsIndex     int
 	channel      int
 	framecounter []byte
-	hbuf         bytes.Buffer
+	hbuf         *bytes.Buffer
 }
 
 // newPacket returns a packet struct with default values, framecounter at 0.
@@ -35,7 +35,7 @@ func newPacket(streamname string) packet {
 		bpsIndex:     0,
 		channel:      0,
 		framecounter: make([]byte, 4),
-		hbuf:         *bytes.NewBuffer(make([]byte, headerSz)),
+		hbuf:         bytes.NewBuffer(make([]byte, headerSz)),
 	}
 }
 
