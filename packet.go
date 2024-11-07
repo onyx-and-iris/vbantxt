@@ -1,6 +1,7 @@
 package vbantxt
 
 import (
+	"bytes"
 	"encoding/binary"
 
 	log "github.com/sirupsen/logrus"
@@ -17,19 +18,24 @@ var BpsOpts = []int{0, 110, 150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200,
 	1000000, 1500000, 2000000, 3000000}
 
 type packet struct {
-	name         string
+	streamname   []byte
 	bpsIndex     int
 	channel      int
 	framecounter []byte
+	hbuf         bytes.Buffer
 }
 
 // newPacket returns a packet struct with default values, framecounter at 0.
 func newPacket(streamname string) packet {
+	streamnameBuf := make([]byte, streamNameSz)
+	copy(streamnameBuf, streamname)
+
 	return packet{
-		name:         streamname,
+		streamname:   streamnameBuf,
 		bpsIndex:     0,
 		channel:      0,
 		framecounter: make([]byte, 4),
+		hbuf:         *bytes.NewBuffer(make([]byte, headerSz)),
 	}
 }
 
@@ -43,24 +49,17 @@ func (p *packet) nbc() byte {
 	return byte(p.channel)
 }
 
-// streamname defines the stream name of the text request
-func (p *packet) streamname() []byte {
-	b := make([]byte, streamNameSz)
-	copy(b, p.name)
-	return b
-}
-
 // header returns a fully formed packet header
 func (p *packet) header() []byte {
-	h := make([]byte, 0, headerSz)
-	h = append(h, []byte("VBAN")...)
-	h = append(h, p.sr())
-	h = append(h, byte(0))
-	h = append(h, p.nbc())
-	h = append(h, byte(0x10))
-	h = append(h, p.streamname()...)
-	h = append(h, p.framecounter...)
-	return h
+	p.hbuf.Reset()
+	p.hbuf.WriteString("VBAN")
+	p.hbuf.WriteByte(p.sr())
+	p.hbuf.WriteByte(byte(0))
+	p.hbuf.WriteByte(p.nbc())
+	p.hbuf.WriteByte(byte(0x10))
+	p.hbuf.Write(p.streamname)
+	p.hbuf.Write(p.framecounter)
+	return p.hbuf.Bytes()
 }
 
 // bumpFrameCounter increments the frame counter by 1
