@@ -92,7 +92,7 @@ For example, in Windows with Powershell you could:
 
 Or with Bash:
 
-`cat script.txt | xargs vbantxt-cli`
+`xargs vbantxt-cli < script.txt`
 
 to load commands from a file:
 
