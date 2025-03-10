@@ -1,3 +1,4 @@
+// Package main provides the configuration loading functionality for the vbantxt application.
 package main
 
 import (

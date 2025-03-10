@@ -9,14 +9,14 @@ import (
 // Option is a functional option type that allows us to configure the VbanTxt.
 type Option func(*VbanTxt)
 
-// WithRateLimit is a functional option to set the ratelimit for requests
+// WithRateLimit is a functional option to set the ratelimit for requests.
 func WithRateLimit(ratelimit time.Duration) Option {
 	return func(vt *VbanTxt) {
 		vt.ratelimit = ratelimit
 	}
 }
 
-// WithBPSOpt is a functional option to set the bps index for {VbanTxt}.packet
+// WithBPSOpt is a functional option to set the bps index for {VbanTxt}.packet.
 func WithBPSOpt(bps int) Option {
 	return func(vt *VbanTxt) {
 		bpsIndex := indexOf(BpsOpts, bps)
@@ -28,7 +28,7 @@ func WithBPSOpt(bps int) Option {
 	}
 }
 
-// WithChannel is a functional option to set the channel for {VbanTxt}.packet
+// WithChannel is a functional option to set the channel for {VbanTxt}.packet.
 func WithChannel(channel int) Option {
 	return func(vt *VbanTxt) {
 		vt.packet.channel = channel

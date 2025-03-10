@@ -35,5 +35,4 @@ func TestLoadConfig_Errors(t *testing.T) {
 			assert.ErrorContains(t, err, tc.err)
 		})
 	}
-
 }

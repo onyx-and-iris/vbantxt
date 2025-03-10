@@ -7,12 +7,12 @@ import (
 	log "github.com/sirupsen/logrus"
 )
 
-// udpConn represents the UDP client
+// udpConn represents the UDP client.
 type udpConn struct {
 	conn *net.UDPConn
 }
 
-// newUDPConn returns a UDP client
+// newUDPConn returns a UDP client.
 func newUDPConn(host string, port int) (udpConn, error) {
 	udpAddr, err := net.ResolveUDPAddr("udp4", fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
@@ -27,7 +27,7 @@ func newUDPConn(host string, port int) (udpConn, error) {
 	return udpConn{conn: conn}, nil
 }
 
-// Write implements the io.WriteCloser interface
+// Write implements the io.WriteCloser interface.
 func (u udpConn) Write(buf []byte) (int, error) {
 	n, err := u.conn.Write(buf)
 	if err != nil {
@@ -38,7 +38,7 @@ func (u udpConn) Write(buf []byte) (int, error) {
 	return n, nil
 }
 
-// Close implements the io.WriteCloser interface
+// Close implements the io.WriteCloser interface.
 func (u udpConn) Close() error {
 	err := u.conn.Close()
 	if err != nil {

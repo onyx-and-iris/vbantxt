@@ -13,9 +13,12 @@ const (
 	headerSz        = 4 + 1 + 1 + 1 + 1 + 16 + 4
 )
 
-var BpsOpts = []int{0, 110, 150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 31250,
+// BpsOpts defines the available baud rate options.
+var BpsOpts = []int{
+	0, 110, 150, 300, 600, 1200, 2400, 4800, 9600, 14400, 19200, 31250,
 	38400, 57600, 115200, 128000, 230400, 250000, 256000, 460800, 921600,
-	1000000, 1500000, 2000000, 3000000}
+	1000000, 1500000, 2000000, 3000000,
+}
 
 type packet struct {
 	streamname   []byte
@@ -39,17 +42,17 @@ func newPacket(streamname string) packet {
 	}
 }
 
-// sr defines the samplerate for the request
+// sr defines the samplerate for the request.
 func (p *packet) sr() byte {
 	return byte(vbanProtocolTxt + p.bpsIndex)
 }
 
-// nbc defines the channel of the request
+// nbc defines the channel of the request.
 func (p *packet) nbc() byte {
 	return byte(p.channel)
 }
 
-// header returns a fully formed packet header
+// header returns a fully formed packet header.
 func (p *packet) header() []byte {
 	p.hbuf.Reset()
 	p.hbuf.WriteString("VBAN")
@@ -62,7 +65,7 @@ func (p *packet) header() []byte {
 	return p.hbuf.Bytes()
 }
 
-// bumpFrameCounter increments the frame counter by 1
+// bumpFrameCounter increments the frame counter by 1.
 func (p *packet) bumpFrameCounter() {
 	x := binary.LittleEndian.Uint32(p.framecounter)
 	binary.LittleEndian.PutUint32(p.framecounter, x+1)

@@ -49,7 +49,7 @@ func (vt VbanTxt) Send(cmd string) error {
 	return nil
 }
 
-// Close is responsible for closing the UDP Client connection
+// Close is responsible for closing the UDP Client connection.
 func (vt VbanTxt) Close() error {
 	err := vt.udpConn.Close()
 	if err != nil {
