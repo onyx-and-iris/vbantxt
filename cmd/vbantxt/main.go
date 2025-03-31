@@ -43,11 +43,11 @@ func main() {
 	flag.IntVar(&ratelimit, "ratelimit", 20, "request ratelimit in milliseconds")
 	flag.IntVar(&ratelimit, "r", 20, "request ratelimit in milliseconds (shorthand)")
 
-	homeDir, err := os.UserHomeDir()
+	configDir, err := os.UserConfigDir()
 	if err != nil {
 		exit(err)
 	}
-	defaultConfigPath := filepath.Join(homeDir, ".config", "vbantxt", "config.toml")
+	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
 	flag.StringVar(&configPath, "config", defaultConfigPath, "config path")
 	flag.StringVar(&configPath, "C", defaultConfigPath, "config path (shorthand)")
 	flag.IntVar(&loglevel, "loglevel", int(log.WarnLevel), "log level")
