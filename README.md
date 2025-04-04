@@ -9,10 +9,10 @@ For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 
 ## Tested against
 
--   Basic 1.0.8.4
--   Banana 2.0.6.4
--   Potato 3.0.2.4
--   Matrix 1.0.0.3
+-   Basic 1.1.1.8
+-   Banana 2.1.1.8
+-   Potato 3.1.1.8
+-   Matrix 1.0.1.2
 
 ## Requirements
 
