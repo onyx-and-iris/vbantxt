@@ -84,7 +84,7 @@ Command line flags will override values in a config.toml.
 
 ## `Script files`
 
-The vbantxt-cli utility accepts a single string request or an array of string requests. This means you can pass scripts stored in files.
+The vbantxt CLI accepts a single string request or an array of string requests. This means you can pass scripts stored in files.
 
 For example, in Windows with Powershell you could:
 
