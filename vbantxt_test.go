@@ -28,14 +28,14 @@ func run(t *testing.T, client *vbantxt.VbanTxt, script []byte) {
 }
 
 func TestSendVm(t *testing.T) {
-	client, err := vbantxt.New("vm.local", 6980, "onyx")
+	client, err := vbantxt.New("localhost", 6980, "onyx")
 	require.NoError(t, err)
 
 	run(t, client, vm)
 }
 
 func TestSendMatrix(t *testing.T) {
-	client, err := vbantxt.New("vm.local", 6990, "onyx")
+	client, err := vbantxt.New("localhost", 6990, "onyx")
 	require.NoError(t, err)
 
 	run(t, client, matrix)
