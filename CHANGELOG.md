@@ -11,6 +11,19 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
+# [0.4.0] - 2024-04-04
+
+### Changed
+
+-   `log-level` flag is now of type string. It accepts any one of trace, debug, info, warn, error, fatal or panic.
+    -   It defaults to warn.
+
+# [0.3.1]
+
+### Fixed
+
+-   The CLI now uses `os.UserConfigDir()` to load the default *config.toml*, which should respect `$XDG_CONFIG_HOME`. See [UserConfigDir](https://pkg.go.dev/os#UserConfigDir)
+
 # [0.2.1] - 2024-11-07
 
 ### Fixed
