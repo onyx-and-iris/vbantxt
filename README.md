@@ -116,8 +116,22 @@ vbantxt -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
 
 ## `Logging`
 
-Log level may be set by passing the `-l` flag with a number from 0 up to 6 where
+The `-log-level` flag allows you to control the verbosity of the application's logging output. 
 
-0 = Panic, 1 = Fatal, 2 = Error, 3 = Warning, 4 = Info, 5 = Debug, 6 = Trace
+Acceptable values for this flag are:
 
-Log level defaults to Warning level.
+- `trace`
+- `debug`
+- `info`
+- `warn`
+- `error`
+- `fatal`
+- `panic`
+
+For example, to set the log level to `debug`, you can use:
+
+```
+vbantxt -s=streamname -log-level=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
+```
+
+The default log level is `warn` if the flag is not specified.

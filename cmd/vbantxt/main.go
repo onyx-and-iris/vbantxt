@@ -5,12 +5,22 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
-	"slices"
 	"time"
 
 	"github.com/onyx-and-iris/vbantxt"
 	log "github.com/sirupsen/logrus"
 )
+
+type opts struct {
+	host       string
+	port       int
+	streamname string
+	bps        int
+	channel    int
+	ratelimit  int
+	configPath string
+	loglevel   string
+}
 
 func exit(err error) {
 	_, _ = fmt.Fprintf(os.Stderr, "Error: %s", err)
@@ -22,7 +32,7 @@ func main() {
 		host       string
 		port       int
 		streamname string
-		loglevel   int
+		loglevel   string
 		configPath string
 		bps        int
 		channel    int
@@ -36,8 +46,8 @@ func main() {
 	flag.StringVar(&streamname, "streamname", "Command1", "stream name for text requests")
 	flag.StringVar(&streamname, "s", "Command1", "stream name for text requests (shorthand)")
 
-	flag.IntVar(&bps, "bps", 0, "vban bps")
-	flag.IntVar(&bps, "b", 0, "vban bps (shorthand)")
+	flag.IntVar(&bps, "bps", 256000, "vban bps")
+	flag.IntVar(&bps, "b", 256000, "vban bps (shorthand)")
 	flag.IntVar(&channel, "channel", 0, "vban channel")
 	flag.IntVar(&channel, "c", 0, "vban channel (shorthand)")
 	flag.IntVar(&ratelimit, "ratelimit", 20, "request ratelimit in milliseconds")
@@ -50,29 +60,60 @@ func main() {
 	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
 	flag.StringVar(&configPath, "config", defaultConfigPath, "config path")
 	flag.StringVar(&configPath, "C", defaultConfigPath, "config path (shorthand)")
-	flag.IntVar(&loglevel, "loglevel", int(log.WarnLevel), "log level")
-	flag.IntVar(&loglevel, "l", int(log.WarnLevel), "log level (shorthand)")
+	flag.StringVar(&loglevel, "log-level", "warn", "log level")
+	flag.StringVar(&loglevel, "l", "warn", "log level (shorthand)")
+
 	flag.Parse()
 
-	if slices.Contains(log.AllLevels, log.Level(loglevel)) {
-		log.SetLevel(log.Level(loglevel))
+	switch loglevel {
+	case "trace":
+		log.SetLevel(log.TraceLevel)
+	case "debug":
+		log.SetLevel(log.DebugLevel)
+	case "info":
+		log.SetLevel(log.InfoLevel)
+	case "warn":
+		log.SetLevel(log.WarnLevel)
+	case "error":
+		log.SetLevel(log.ErrorLevel)
+	case "fatal":
+		log.SetLevel(log.FatalLevel)
+	case "panic":
+		log.SetLevel(log.PanicLevel)
+	default:
+		exit(fmt.Errorf("invalid log level: %s", loglevel))
 	}
 
+	o := opts{
+		host:       host,
+		port:       port,
+		streamname: streamname,
+		bps:        bps,
+		channel:    channel,
+		ratelimit:  ratelimit,
+		configPath: configPath,
+		loglevel:   loglevel,
+	}
+
+	// Load the config only if the host, port, and streamname flags are not provided.
+	// This allows the user to override the config values with command line flags.
 	if !flagsPassed([]string{"host", "h", "port", "p", "streamname", "s"}) {
 		config, err := loadConfig(configPath)
 		if err != nil {
 			exit(err)
 		}
-		host = config.Host
-		port = config.Port
-		streamname = config.Streamname
-	}
 
-	client, err := createClient(host, port, streamname, bps, channel, ratelimit)
+		o.host = config.Host
+		o.port = config.Port
+		o.streamname = config.Streamname
+	}
+	log.Debugf("opts: %+v", o)
+
+	client, closer, err := createClient(o)
 	if err != nil {
 		exit(err)
 	}
-	defer client.Close()
+	defer closer()
 
 	for _, arg := range flag.Args() {
 		err := client.Send(arg)
@@ -82,16 +123,24 @@ func main() {
 	}
 }
 
-func createClient(host string, port int, streamname string, bps, channel, ratelimit int) (*vbantxt.VbanTxt, error) {
+// createClient creates a new vban client with the provided options.
+func createClient(o opts) (*vbantxt.VbanTxt, func(), error) {
 	client, err := vbantxt.New(
-		host,
-		port,
-		streamname,
-		vbantxt.WithBPSOpt(bps),
-		vbantxt.WithChannel(channel),
-		vbantxt.WithRateLimit(time.Duration(ratelimit)*time.Millisecond))
+		o.host,
+		o.port,
+		o.streamname,
+		vbantxt.WithBPSOpt(o.bps),
+		vbantxt.WithChannel(o.channel),
+		vbantxt.WithRateLimit(time.Duration(o.ratelimit)*time.Millisecond))
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return client, err
+
+	closer := func() {
+		if err := client.Close(); err != nil {
+			log.Error(err)
+		}
+	}
+
+	return client, closer, err
 }
