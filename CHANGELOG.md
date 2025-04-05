@@ -11,11 +11,11 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
-# [0.4.0] - 2025-04-04
+# [0.4.1] - 2025-04-05
 
 ### Changed
 
--   `log-level` flag is now of type string. It accepts any one of trace, debug, info, warn, error, fatal or panic.
+-   `-loglevel` flag is now of type string. It accepts any one of trace, debug, info, warn, error, fatal or panic.
     -   It defaults to warn.
 
 # [0.3.1] - 2025-03-31

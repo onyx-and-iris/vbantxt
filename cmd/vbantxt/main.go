@@ -23,7 +23,7 @@ type opts struct {
 }
 
 func exit(err error) {
-	_, _ = fmt.Fprintf(os.Stderr, "Error: %s", err)
+	_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	os.Exit(1)
 }
 
@@ -60,29 +60,16 @@ func main() {
 	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
 	flag.StringVar(&configPath, "config", defaultConfigPath, "config path")
 	flag.StringVar(&configPath, "C", defaultConfigPath, "config path (shorthand)")
-	flag.StringVar(&loglevel, "log-level", "warn", "log level")
+	flag.StringVar(&loglevel, "loglevel", "warn", "log level")
 	flag.StringVar(&loglevel, "l", "warn", "log level (shorthand)")
 
 	flag.Parse()
 
-	switch loglevel {
-	case "trace":
-		log.SetLevel(log.TraceLevel)
-	case "debug":
-		log.SetLevel(log.DebugLevel)
-	case "info":
-		log.SetLevel(log.InfoLevel)
-	case "warn":
-		log.SetLevel(log.WarnLevel)
-	case "error":
-		log.SetLevel(log.ErrorLevel)
-	case "fatal":
-		log.SetLevel(log.FatalLevel)
-	case "panic":
-		log.SetLevel(log.PanicLevel)
-	default:
+	level, err := log.ParseLevel(loglevel)
+	if err != nil {
 		exit(fmt.Errorf("invalid log level: %s", loglevel))
 	}
+	log.SetLevel(level)
 
 	o := opts{
 		host:       host,

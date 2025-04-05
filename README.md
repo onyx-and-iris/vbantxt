@@ -116,7 +116,7 @@ vbantxt -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
 
 ## `Logging`
 
-The `-log-level` flag allows you to control the verbosity of the application's logging output. 
+The `-loglevel` flag allows you to control the verbosity of the application's logging output. 
 
 Acceptable values for this flag are:
 
@@ -131,7 +131,7 @@ Acceptable values for this flag are:
 For example, to set the log level to `debug`, you can use:
 
 ```
-vbantxt -s=streamname -log-level=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
+vbantxt -s=streamname -loglevel=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
 ```
 
 The default log level is `warn` if the flag is not specified.
