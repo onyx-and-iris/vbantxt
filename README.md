@@ -7,23 +7,37 @@ Send Voicemeeter/Matrix vban requests.
 
 For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 
-## Tested against
+---
 
--   Basic 1.1.1.8
--   Banana 2.1.1.8
--   Potato 3.1.1.8
--   Matrix 1.0.1.2
+## Table of Contents
+
+- [Installation](#installation)
+- [VBANTXT Package](#vbantxt-package)
+- [VBANTXT CLI](#vbantxt-cli)
+- [License](#license)
 
 ## Requirements
 
 -   [Voicemeeter](https://voicemeeter.com/) or [Matrix](https://vb-audio.com/Matrix/)
--   Go 1.18 or greater (if you want to compile yourself, otherwise check `Releases`)
+-   Go 1.18 or greater (a binary is available in [Releases](https://github.com/onyx-and-iris/vbantxt/releases))
+
+## Tested against
+
+-   Basic 1.1.1.9
+-   Banana 2.1.1.9
+-   Potato 3.1.1.9
+-   Matrix 1.0.1.2
+
+
+## Installation
+
+```console
+go get github.com/onyx-and-iris/vbantxt
+```
 
 ---
 
-## `Use`
-
-`go get github.com/onyx-and-iris/vbantxt`
+## `VBANTXT Package`
 
 ```go
 package main
@@ -55,35 +69,49 @@ func main() {
 }
 ```
 
-## `Command Line`
+## `VBANTXT CLI`
+
+### Use
+
+Simply pass your vban commands as commane line arguments:
+
+```console
+vbantxt "strip[0].mute=1 strip[1].mono=1"
+```
 
 ### Configuration
 
 #### Flags
 
--	--host/-H: defaults to localhost
--	--port/-p: defaults to 6980
--	--streamname/-s: defaults to Command1
--	--config/-C: defaults to `$XDG_CONFIG_HOME / vbantxt / config.toml`
--	--loglevel/-l: defaults to warn
--	--version/-v: print the vbantxt version and exit
+```console
+FLAGS
+  -H, --host STRING         VBAN host (default: localhost)
+  -p, --port INT            VBAN port (default: 6980)
+  -s, --streamname STRING   VBAN stream name (default: Command1)
+  -b, --bps INT             VBAN BPS (default: 256000)
+  -n, --channel INT         VBAN channel (default: 0)
+  -r, --ratelimit INT       VBAN rate limit (ms) (default: 20)
+  -C, --config STRING       Path to the configuration file (default: $XDG_CONFIG_HOME/vbantxt/config.toml)
+  -l, --loglevel STRING     Log level (debug, info, warn, error, fatal, panic) (default: warn)
+  -v, --version             Show version information
+```
 
-For example:
+Pass --host, --port and --password as flags on the root command, for example:
 
 ```console
-vbantxt --host="gamepc.local" --port=6980 --streamname=Command1 "strip[0].mute=1 strip[1].mono=1"
+vbantxt --host=localhost --port=6980 --streamname=Command1 --help
 ```
 
 #### Environment Variables
 
-Load the following values from your environment:
+All flags have corresponding environment variables, prefixed with `VBANTTXT_`:
 
 ```bash
 #!/usr/bin/env bash
 
 export VBANTXT_HOST=localhost
 export VBANTXT_PORT=6980
-export VBANTXT_STREAMNAME=onyx
+export VBANTXT_STREAMNAME=Command1
 ```
 
 Flags will override environment variables.
@@ -93,16 +121,15 @@ Flags will override environment variables.
 By default the config loader will look for a config in:
 
 -	$XDG_CONFIG_HOME / vbantxt / config.toml (see [os.UserConfigDir](https://pkg.go.dev/os#UserConfigDir))
+	-	A custom config path may be passed with the --config/-C flag.
 
-A valid config.toml might look like this:
+All flags have corresponding keys in the config file, for example:
 
 ```toml
 host="gamepc.local"
 port=6980
 streamname="Command1"
 ```
-
-A custom config path may be passed with the --config/-C flag.
 
 ---
 
@@ -162,3 +189,8 @@ vbantxt --loglevel=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
 ```
 
 The default log level is `warn` if the flag is not specified.
+
+
+## License
+
+`vbantxt` is distributed under the terms of the [MIT](https://spdx.org/licenses/MIT.html) license.
