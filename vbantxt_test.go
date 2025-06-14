@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	_ "embed"
+	"os"
 	"testing"
 
 	"github.com/onyx-and-iris/vbantxt"
@@ -28,14 +29,14 @@ func run(t *testing.T, client *vbantxt.VbanTxt, script []byte) {
 }
 
 func TestSendVm(t *testing.T) {
-	client, err := vbantxt.New("localhost", 6980, "onyx")
+	client, err := vbantxt.New(os.Getenv("VBANTXT_HOST"), 6980, os.Getenv("VBANTXT_STREAMNAME"))
 	require.NoError(t, err)
 
 	run(t, client, vm)
 }
 
 func TestSendMatrix(t *testing.T) {
-	client, err := vbantxt.New("localhost", 6990, "onyx")
+	client, err := vbantxt.New(os.Getenv("VBANTXT_HOST"), 6990, os.Getenv("VBANTXT_STREAMNAME"))
 	require.NoError(t, err)
 
 	run(t, client, matrix)
