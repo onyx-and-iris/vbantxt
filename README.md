@@ -96,7 +96,7 @@ FLAGS
   -v, --version             Show version information
 ```
 
-Pass --host, --port and --password as flags on the root command, for example:
+Pass --host, --port and --streamname as flags on the root command, for example:
 
 ```console
 vbantxt --host=localhost --port=6980 --streamname=Command1 --help
