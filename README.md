@@ -57,28 +57,52 @@ func main() {
 
 ## `Command Line`
 
-Pass `host`, `port` and `streamname` as flags, for example:
+### Configuration
 
+#### Flags
+
+-	--host/-H: defaults to localhost
+-	--port/-p: defaults to 6980
+-	--streamname/-s: defaults to Command1
+-	--config/-C: defaults to `$XDG_CONFIG_HOME / vbantxt / config.toml`
+-	--loglevel/-l: defaults to warn
+-	--version/-v: print the vbantxt version and exit
+
+For example:
+
+```console
+vbantxt --host="gamepc.local" --port=6980 --streamname=Command1 "strip[0].mute=1 strip[1].mono=1"
 ```
-vbantxt -h="gamepc.local" -p=6980 -s=Command1 "strip[0].mute=1 strip[1].mono=1"
+
+#### Environment Variables
+
+Load the following values from your environment:
+
+```bash
+#!/usr/bin/env bash
+
+export VBANTXT_HOST=localhost
+export VBANTXT_PORT=6980
+export VBANTXT_STREAMNAME=onyx
 ```
 
-You may also store them in a `config.toml` located in `home directory / .config / vbantxt /`
+Flags will override environment variables.
 
-A valid `config.toml` might look like this:
+#### TOML Config
+
+By default the config loader will look for a config in:
+
+-	$XDG_CONFIG_HOME / vbantxt / config.toml (see [os.UserConfigDir](https://pkg.go.dev/os#UserConfigDir))
+
+A valid config.toml might look like this:
 
 ```toml
-[connection]
 host="gamepc.local"
 port=6980
 streamname="Command1"
 ```
 
--   `host` defaults to "localhost"
--   `port` defaults to 6980
--   `streamname` defaults to "Command1"
-
-Command line flags will override values in a config.toml.
+A custom config path may be passed with the --config/-C flag.
 
 ---
 
@@ -88,11 +112,15 @@ The vbantxt CLI accepts a single string request or an array of string requests. 
 
 For example, in Windows with Powershell you could:
 
-`vbantxt $(Get-Content .\script.txt)`
+```console
+vbantxt $(Get-Content .\script.txt)
+```
 
 Or with Bash:
 
-`xargs vbantxt < script.txt`
+```console
+xargs vbantxt < script.txt
+```
 
 to load commands from a file:
 
@@ -108,19 +136,18 @@ bus[3].eq.On=0
 
 Sending commands to VB-Audio Matrix is also possible, for example:
 
-```
-vbantxt -s=streamname "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
+```console
+vbantxt "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
 ```
 
 ---
 
 ## `Logging`
 
-The `-loglevel` flag allows you to control the verbosity of the application's logging output. 
+The --loglevel/-l flag allows you to control the verbosity of the application's logging output. 
 
 Acceptable values for this flag are:
 
-- `trace`
 - `debug`
 - `info`
 - `warn`
@@ -130,8 +157,8 @@ Acceptable values for this flag are:
 
 For example, to set the log level to `debug`, you can use:
 
-```
-vbantxt -s=streamname -loglevel=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
+```console
+vbantxt "bus[0].eq.on=1 bus[1].gain=-12.8"
 ```
 
 The default log level is `warn` if the flag is not specified.
