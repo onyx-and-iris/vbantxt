@@ -104,7 +104,7 @@ vbantxt --host=localhost --port=6980 --streamname=Command1 --help
 
 #### Environment Variables
 
-All flags have corresponding environment variables, prefixed with `VBANTTXT_`:
+All flags have corresponding environment variables, prefixed with `VBANTXT_`:
 
 ```bash
 #!/usr/bin/env bash
