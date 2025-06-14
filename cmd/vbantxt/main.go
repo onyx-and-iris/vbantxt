@@ -1,108 +1,106 @@
+// Package main implements a command-line tool for sending text messages over VBAN using the vbantxt library.
 package main
 
 import (
-	"flag"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
+	"runtime/debug"
+	"strings"
 	"time"
 
+	"github.com/charmbracelet/log"
 	"github.com/onyx-and-iris/vbantxt"
-	log "github.com/sirupsen/logrus"
+	"github.com/peterbourgon/ff/v4"
+	"github.com/peterbourgon/ff/v4/ffhelp"
+	"github.com/peterbourgon/ff/v4/fftoml"
 )
 
-type opts struct {
-	host       string
-	port       int
-	streamname string
-	bps        int
-	channel    int
-	ratelimit  int
-	configPath string
-	loglevel   string
+var version string // Version will be set at build time
+
+// Flags holds the command-line flags for the VBANTXT client.
+type Flags struct {
+	Host       string
+	Port       int
+	Streamname string
+	Bps        int
+	Channel    int
+	Ratelimit  int
+	ConfigPath string // Path to the configuration file
+	Loglevel   string // Log level
+	Version    bool   // Version flag
 }
 
-func exit(err error) {
+func exitOnError(err error) {
 	_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	os.Exit(1)
 }
 
 func main() {
-	var (
-		host       string
-		port       int
-		streamname string
-		loglevel   string
-		configPath string
-		bps        int
-		channel    int
-		ratelimit  int
-	)
+	var flags Flags
 
-	flag.StringVar(&host, "host", "localhost", "vban host")
-	flag.StringVar(&host, "h", "localhost", "vban host (shorthand)")
-	flag.IntVar(&port, "port", 6980, "vban server port")
-	flag.IntVar(&port, "p", 6980, "vban server port (shorthand)")
-	flag.StringVar(&streamname, "streamname", "Command1", "stream name for text requests")
-	flag.StringVar(&streamname, "s", "Command1", "stream name for text requests (shorthand)")
-
-	flag.IntVar(&bps, "bps", 256000, "vban bps")
-	flag.IntVar(&bps, "b", 256000, "vban bps (shorthand)")
-	flag.IntVar(&channel, "channel", 0, "vban channel")
-	flag.IntVar(&channel, "c", 0, "vban channel (shorthand)")
-	flag.IntVar(&ratelimit, "ratelimit", 20, "request ratelimit in milliseconds")
-	flag.IntVar(&ratelimit, "r", 20, "request ratelimit in milliseconds (shorthand)")
+	// VBAN specific flags
+	fs := ff.NewFlagSet("vbantxt")
+	fs.StringVar(&flags.Host, 'H', "host", "localhost", "VBAN host")
+	fs.IntVar(&flags.Port, 'p', "port", 6980, "VBAN port")
+	fs.StringVar(&flags.Streamname, 's', "streamname", "Command1", "VBAN stream name")
+	fs.IntVar(&flags.Bps, 'b', "bps", 256000, "VBAN BPS")
+	fs.IntVar(&flags.Channel, 'n', "channel", 0, "VBAN channel")
+	fs.IntVar(&flags.Ratelimit, 'r', "ratelimit", 20, "VBAN rate limit (ms)")
 
 	configDir, err := os.UserConfigDir()
 	if err != nil {
-		exit(err)
+		exitOnError(fmt.Errorf("failed to get user config directory: %w", err))
 	}
 	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
-	flag.StringVar(&configPath, "config", defaultConfigPath, "config path")
-	flag.StringVar(&configPath, "C", defaultConfigPath, "config path (shorthand)")
-	flag.StringVar(&loglevel, "loglevel", "warn", "log level")
-	flag.StringVar(&loglevel, "l", "warn", "log level (shorthand)")
 
-	flag.Parse()
+	// Configuration file and logging flags
+	fs.StringVar(&flags.ConfigPath, 'C', "config", defaultConfigPath, "Path to the configuration file")
+	fs.StringVar(&flags.Loglevel, 'l', "loglevel", "warn", "Log level (debug, info, warn, error, fatal, panic)")
+	fs.BoolVar(&flags.Version, 'v', "version", "Show version information")
 
-	level, err := log.ParseLevel(loglevel)
+	err = ff.Parse(fs, os.Args[1:],
+		ff.WithEnvVarPrefix("VBANTXT"),
+		ff.WithConfigFileFlag("config"),
+		ff.WithConfigAllowMissingFile(),
+		ff.WithConfigFileParser(fftoml.Parser{Delimiter: "."}.Parse),
+	)
+	switch {
+	case errors.Is(err, ff.ErrHelp):
+		fmt.Fprintf(os.Stderr, "%s\n", ffhelp.Flags(fs, "vbantxt [flags] <vban commands>"))
+		os.Exit(0)
+	case err != nil:
+		exitOnError(fmt.Errorf("failed to parse flags: %w", err))
+	}
+
+	if flags.Version {
+		if version == "" {
+			info, ok := debug.ReadBuildInfo()
+			if !ok {
+				exitOnError(errors.New("failed to read build info"))
+			}
+			version = strings.Split(info.Main.Version, "-")[0]
+		}
+		fmt.Printf("vbantxt version: %s\n", version)
+		os.Exit(0)
+	}
+
+	level, err := log.ParseLevel(flags.Loglevel)
 	if err != nil {
-		exit(fmt.Errorf("invalid log level: %s", loglevel))
+		exitOnError(fmt.Errorf("invalid log level: %s", flags.Loglevel))
 	}
 	log.SetLevel(level)
 
-	o := opts{
-		host:       host,
-		port:       port,
-		streamname: streamname,
-		bps:        bps,
-		channel:    channel,
-		ratelimit:  ratelimit,
-		configPath: configPath,
-		loglevel:   loglevel,
-	}
+	log.Debugf("Loaded configuration: %+v", flags)
 
-	// Load the config only if the host, port, and streamname flags are not provided.
-	// This allows the user to override the config values with command line flags.
-	if !flagsPassed([]string{"host", "h", "port", "p", "streamname", "s"}) {
-		config, err := loadConfig(configPath)
-		if err != nil {
-			exit(err)
-		}
-
-		o.host = config.Host
-		o.port = config.Port
-		o.streamname = config.Streamname
-	}
-	log.Debugf("opts: %+v", o)
-
-	client, closer, err := createClient(o)
+	client, closer, err := createClient(&flags)
 	if err != nil {
-		exit(err)
+		exitOnError(err)
 	}
 	defer closer()
 
-	for _, arg := range flag.Args() {
+	for _, arg := range fs.GetArgs() {
 		err := client.Send(arg)
 		if err != nil {
 			log.Error(err)
@@ -111,14 +109,14 @@ func main() {
 }
 
 // createClient creates a new vban client with the provided options.
-func createClient(o opts) (*vbantxt.VbanTxt, func(), error) {
+func createClient(flags *Flags) (*vbantxt.VbanTxt, func(), error) {
 	client, err := vbantxt.New(
-		o.host,
-		o.port,
-		o.streamname,
-		vbantxt.WithBPSOpt(o.bps),
-		vbantxt.WithChannel(o.channel),
-		vbantxt.WithRateLimit(time.Duration(o.ratelimit)*time.Millisecond))
+		flags.Host,
+		flags.Port,
+		flags.Streamname,
+		vbantxt.WithBPSOpt(flags.Bps),
+		vbantxt.WithChannel(flags.Channel),
+		vbantxt.WithRateLimit(time.Duration(flags.Ratelimit)*time.Millisecond))
 	if err != nil {
 		return nil, nil, err
 	}
