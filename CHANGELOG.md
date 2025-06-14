@@ -15,14 +15,14 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 ### Added
 
--   it's now possible to load configuration from environment variables. See [Environment Variables]()
+-   it's now possible to load configuration from environment variables. See [Environment Variables](https://github.com/onyx-and-iris/vbantxt/tree/main?tab=readme-ov-file#environment-variables)
 -   --version/-v command
 
 ### Changed
 
 -   shortname for --host flag is now -H.
 -   shortname for --channel flag is now -n.
--   toml loader no longer requires a `[connection]` table. See [TOML Config]()
+-   toml loader no longer requires a `[connection]` table. See [TOML Config](https://github.com/onyx-and-iris/vbantxt/tree/main?tab=readme-ov-file#toml-config)
 
 
 # [0.4.1] - 2025-04-05
