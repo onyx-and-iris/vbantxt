@@ -11,6 +11,20 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
+# [0.5.0] - 2025-06-25
+
+### Added
+
+-   it's now possible to load configuration from environment variables. See [Environment Variables]()
+-   --version/-v command
+
+### Changed
+
+-   shortname for --host flag is now -H.
+-   shortname for --channel flag is now -n.
+-   toml loader no longer requires a `[connection]` table. See [TOML Config]()
+
+
 # [0.4.1] - 2025-04-05
 
 ### Changed

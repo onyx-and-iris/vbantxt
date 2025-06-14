@@ -158,7 +158,7 @@ Acceptable values for this flag are:
 For example, to set the log level to `debug`, you can use:
 
 ```console
-vbantxt "bus[0].eq.on=1 bus[1].gain=-12.8"
+vbantxt --loglevel=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
 ```
 
 The default log level is `warn` if the flag is not specified.
