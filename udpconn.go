@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"net"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/charmbracelet/log"
 )
 
 // udpConn represents the UDP client.

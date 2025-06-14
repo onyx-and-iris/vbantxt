@@ -3,7 +3,7 @@ package vbantxt
 import (
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/charmbracelet/log"
 )
 
 // Option is a functional option type that allows us to configure the VbanTxt.

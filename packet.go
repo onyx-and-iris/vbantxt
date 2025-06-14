@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"encoding/binary"
 
-	log "github.com/sirupsen/logrus"
+	"github.com/charmbracelet/log"
 )
 
 const (
@@ -70,5 +70,5 @@ func (p *packet) bumpFrameCounter() {
 	x := binary.LittleEndian.Uint32(p.framecounter)
 	binary.LittleEndian.PutUint32(p.framecounter, x+1)
 
-	log.Tracef("framecounter: %d", x)
+	log.Debugf("framecounter: %d", x)
 }
