@@ -5,7 +5,7 @@ BIN_DIR := bin
 
 WINDOWS=$(BIN_DIR)/$(PROGRAM)_windows_amd64.exe
 LINUX=$(BIN_DIR)/$(PROGRAM)_linux_amd64
-VERSION=$(shell git log -n 1 --format=%h)
+VERSION=$(shell git describe --tags $(shell git rev-list --tags --max-count=1))
 
 .DEFAULT_GOAL := build
 

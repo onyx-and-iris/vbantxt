@@ -4,11 +4,11 @@ vars:
   PROGRAM: vbantxt
   SHELL: '{{if eq .OS "Windows_NT"}}powershell{{end}}'
   BIN_DIR: bin
+  VERSION:
+    sh: 'git describe --tags $(git rev-list --tags --max-count=1)'
 
   WINDOWS: '{{.BIN_DIR}}/{{.PROGRAM}}_windows_amd64.exe'
   LINUX: '{{.BIN_DIR}}/{{.PROGRAM}}_linux_amd64'
-  GIT_COMMIT:
-    sh: git log -n 1 --format=%h
 
 tasks:
   default:
@@ -37,12 +37,12 @@ tasks:
   build-windows:
     desc: Build the vbantxt project for Windows
     cmds:
-      - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X main.Version={{.GIT_COMMIT}}" ./cmd/{{.PROGRAM}}/
+      - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
 
   build-linux:
     desc: Build the vbantxt project for Linux
     cmds:
-      - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.Version={{.GIT_COMMIT}}" ./cmd/{{.PROGRAM}}/
+      - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
 
   test:
     desc: Run tests
