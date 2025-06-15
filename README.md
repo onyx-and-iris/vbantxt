@@ -73,7 +73,7 @@ func main() {
 
 ### Use
 
-Simply pass your vban commands as commane line arguments:
+Simply pass your vban commands as command line arguments:
 
 ```console
 vbantxt "strip[0].mute=1 strip[1].mono=1"
