@@ -28,16 +28,13 @@ For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 -   Potato 3.1.1.9
 -   Matrix 1.0.1.2
 
+---
 
-## Installation
+## `VBANTXT Package`
 
 ```console
 go get github.com/onyx-and-iris/vbantxt
 ```
-
----
-
-## `VBANTXT Package`
 
 ```go
 package main
@@ -70,6 +67,12 @@ func main() {
 ```
 
 ## `VBANTXT CLI`
+
+### Installation
+
+```console
+go install github.com/onyx-and-iris/vbantxt/cmd/vbantxt@latest
+```
 
 ### Use
 
