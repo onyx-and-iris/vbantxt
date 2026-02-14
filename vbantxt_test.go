@@ -7,8 +7,9 @@ import (
 	"os"
 	"testing"
 
-	"github.com/onyx-and-iris/vbantxt"
 	"github.com/stretchr/testify/require"
+
+	"github.com/onyx-and-iris/vbantxt"
 )
 
 //go:embed testdata/vm.txt
