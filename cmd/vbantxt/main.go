@@ -11,10 +11,11 @@ import (
 	"time"
 
 	"github.com/charmbracelet/log"
-	"github.com/onyx-and-iris/vbantxt"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 	"github.com/peterbourgon/ff/v4/fftoml"
+
+	"github.com/onyx-and-iris/vbantxt"
 )
 
 var version string // Version will be set at build time
@@ -32,8 +33,22 @@ type Flags struct {
 	Version    bool   // Version flag
 }
 
+func (f *Flags) String() string {
+	return fmt.Sprintf(
+		"Host: %s, Port: %d, Streamname: %s, Bps: %d, Channel: %d, Ratelimit: %dms, ConfigPath: %s, Loglevel: %s",
+		f.Host,
+		f.Port,
+		f.Streamname,
+		f.Bps,
+		f.Channel,
+		f.Ratelimit,
+		f.ConfigPath,
+		f.Loglevel,
+	)
+}
+
 func exitOnError(err error) {
-	_, _ = fmt.Fprintf(os.Stderr, "Error: %s\n", err)
+	fmt.Fprintf(os.Stderr, "Error: %s\n", err)
 	os.Exit(1)
 }
 
@@ -41,7 +56,7 @@ func main() {
 	var flags Flags
 
 	// VBAN specific flags
-	fs := ff.NewFlagSet("vbantxt")
+	fs := ff.NewFlagSet("vbantxt - A command-line tool for sending text requests over VBAN")
 	fs.StringVar(&flags.Host, 'H', "host", "localhost", "VBAN host")
 	fs.IntVar(&flags.Port, 'p', "port", 6980, "VBAN port")
 	fs.StringVar(&flags.Streamname, 's', "streamname", "Command1", "VBAN stream name")
@@ -56,8 +71,20 @@ func main() {
 	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
 
 	// Configuration file and logging flags
-	fs.StringVar(&flags.ConfigPath, 'C', "config", defaultConfigPath, "Path to the configuration file")
-	fs.StringVar(&flags.Loglevel, 'l', "loglevel", "warn", "Log level (debug, info, warn, error, fatal, panic)")
+	fs.StringVar(
+		&flags.ConfigPath,
+		'C',
+		"config",
+		defaultConfigPath,
+		"Path to the configuration file",
+	)
+	fs.StringVar(
+		&flags.Loglevel,
+		'l',
+		"loglevel",
+		"warn",
+		"Log level (debug, info, warn, error, fatal, panic)",
+	)
 	fs.BoolVar(&flags.Version, 'v', "version", "Show version information")
 
 	err = ff.Parse(fs, os.Args[1:],
@@ -75,14 +102,7 @@ func main() {
 	}
 
 	if flags.Version {
-		if version == "" {
-			info, ok := debug.ReadBuildInfo()
-			if !ok {
-				exitOnError(errors.New("failed to read build info"))
-			}
-			version = strings.Split(info.Main.Version, "-")[0]
-		}
-		fmt.Printf("vbantxt version: %s\n", version)
+		fmt.Printf("vbantxt version: %s\n", versionFromBuild())
 		os.Exit(0)
 	}
 
@@ -92,7 +112,7 @@ func main() {
 	}
 	log.SetLevel(level)
 
-	log.Debugf("Loaded configuration: %+v", flags)
+	log.Debugf("Loaded configuration: %s", flags.String())
 
 	client, closer, err := createClient(&flags)
 	if err != nil {
@@ -100,12 +120,24 @@ func main() {
 	}
 	defer closer()
 
-	for _, arg := range fs.GetArgs() {
-		err := client.Send(arg)
-		if err != nil {
-			log.Error(err)
-		}
+	commands := fs.GetArgs()
+	if len(commands) == 0 {
+		exitOnError(errors.New("no VBAN commands provided"))
 	}
+
+	sendCommands(client, commands)
+}
+
+// versionFromBuild retrieves the version information from the build metadata.
+func versionFromBuild() string {
+	if version == "" {
+		info, ok := debug.ReadBuildInfo()
+		if !ok {
+			exitOnError(errors.New("failed to read build info"))
+		}
+		version = strings.Split(info.Main.Version, "-")[0]
+	}
+	return version
 }
 
 // createClient creates a new vban client with the provided options.
@@ -128,4 +160,15 @@ func createClient(flags *Flags) (*vbantxt.VbanTxt, func(), error) {
 	}
 
 	return client, closer, err
+}
+
+// sendCommands sends a list of commands to the VBAN client.
+func sendCommands(client *vbantxt.VbanTxt, commands []string) {
+	for _, cmd := range commands {
+		err := client.Send(cmd)
+		if err != nil {
+			log.Errorf("Failed to send command '%s': %v", cmd, err)
+			continue
+		}
+	}
 }
