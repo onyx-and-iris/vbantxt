@@ -39,16 +39,19 @@ tasks:
     desc: Build the vbantxt project for Windows
     cmds:
       - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
 
   build-linux:
     desc: Build the vbantxt project for Linux
     cmds:
       - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
 
   build-macos:
     desc: Build the vbantxt project for macOS
     cmds:
       - GOOS=darwin GOARCH=amd64 go build -o {{.MACOS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+    internal: true
 
   test:
     desc: Run tests
