@@ -11,6 +11,17 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
+# [0.6.0] - 2025-02-14
+
+### Added
+
+- streamname length validation added to {packet} factory method.
+
+### Changed
+- {packet}.bspIndex now defaults to *indexOf(BpsOpts, 256000)*.
+    -   this doesn't affect the CLI which already defaulted to 256000.
+- WithBPSOpt and WithChannel functional options now log at warn level if passed out of bounds value. They will fallback to valid defaults.
+
 # [0.5.0] - 2025-06-25
 
 ### Added
