@@ -9,6 +9,7 @@ vars:
 
   WINDOWS: '{{.BIN_DIR}}/{{.PROGRAM}}_windows_amd64.exe'
   LINUX: '{{.BIN_DIR}}/{{.PROGRAM}}_linux_amd64'
+  MACOS: '{{.BIN_DIR}}/{{.PROGRAM}}_darwin_amd64'
 
 tasks:
   default:
@@ -22,7 +23,7 @@ tasks:
     cmds:
       - task: build-windows
       - task: build-linux
-
+      - task: build-macos
   vet:
     desc: Vet the code
     deps: [fmt]
@@ -43,6 +44,11 @@ tasks:
     desc: Build the vbantxt project for Linux
     cmds:
       - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
+
+  build-macos:
+    desc: Build the vbantxt project for macOS
+    cmds:
+      - GOOS=darwin GOARCH=amd64 go build -o {{.MACOS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
 
   test:
     desc: Run tests
