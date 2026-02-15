@@ -162,13 +162,11 @@ func createClient(flags *Flags) (*vbantxt.VbanTxt, func(), error) {
 	return client, closer, err
 }
 
-// sendCommands sends a list of commands to the VBAN client.
+// sendCommands sends the provided VBAN commands using the client and logs any errors that occur.
 func sendCommands(client *vbantxt.VbanTxt, commands []string) {
 	for _, cmd := range commands {
-		err := client.Send(cmd)
-		if err != nil {
+		if err := client.Send(cmd); err != nil {
 			log.Errorf("Failed to send command '%s': %v", cmd, err)
-			continue
 		}
 	}
 }
