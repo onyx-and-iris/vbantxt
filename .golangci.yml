@@ -67,6 +67,7 @@ linters:
         - name: unused-parameter
         - name: var-declaration
         - name: blank-imports
+        - name: range
 
         # Disabled rules (can be enabled if needed)
         # - name: line-length-limit
@@ -80,6 +81,17 @@ linters:
       excludes:
         - G104 # Duplicated errcheck checks
         - G115 # integer overflow conversion int -> uint32
+
+  exclusions:
+    warn-unused: false
+    rules:
+      # Exclude some linters from running on tests files.
+      - path: _test\.go
+        linters:
+          - gocyclo
+          - errcheck
+          - dupl
+          - gosec
 
 # Formatters configuration
 formatters:
@@ -106,5 +118,8 @@ formatters:
       extra-rules: true # Enable additional formatting rules
 
 issues:
-  max-same-issues: 0
-  max-issues-per-linter: 0
+  # Limit the number of same issues reported to avoid spam
+  max-same-issues: 50
+
+  # Limit the number of issues per linter to keep output manageable
+  max-issues-per-linter: 100
