@@ -141,8 +141,8 @@ func run() (func(), error) {
 			"no VBAN commands provided; please provide at least one command as an argument",
 		)
 	}
-
 	sendCommands(client, commands)
+
 	return closer, nil
 }
 
@@ -177,7 +177,7 @@ func createClient(flags *Flags) (*vbantxt.VbanTxt, func(), error) {
 		}
 	}
 
-	return client, closer, err
+	return client, closer, nil
 }
 
 // sendCommands sends the provided VBAN commands using the client and logs any errors that occur.
