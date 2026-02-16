@@ -47,6 +47,9 @@ func (f *Flags) String() string {
 	)
 }
 
+// main is the entry point of the application.
+// It sets up a deferred function to handle exiting with the appropriate exit code
+// and calls the run function to execute the main logic.
 func main() {
 	var exitCode int
 
@@ -112,14 +115,14 @@ func run() (func(), error) {
 	switch {
 	case errors.Is(err, ff.ErrHelp):
 		fmt.Fprintf(os.Stderr, "%s\n", ffhelp.Flags(fs, "vbantxt [flags] <vban commands>"))
-		os.Exit(0)
+		return nil, nil
 	case err != nil:
 		return nil, fmt.Errorf("failed to parse flags: %w", err)
 	}
 
 	if flags.Version {
 		fmt.Printf("vbantxt version: %s\n", versionFromBuild())
-		os.Exit(0)
+		return nil, nil
 	}
 
 	level, err := log.ParseLevel(flags.Loglevel)
