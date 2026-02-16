@@ -151,14 +151,15 @@ func run() (func(), error) {
 
 // versionFromBuild retrieves the version information from the build metadata.
 func versionFromBuild() string {
-	if version == "" {
-		info, ok := debug.ReadBuildInfo()
-		if !ok {
-			return "(unable to read build info)"
-		}
-		version = strings.Split(info.Main.Version, "-")[0]
+	if version != "" {
+		return version
 	}
-	return version
+
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "(unable to read version)"
+	}
+	return strings.Split(info.Main.Version, "-")[0]
 }
 
 // createClient creates a new vban client with the provided options.
