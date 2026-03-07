@@ -1,5 +1,6 @@
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![macOS](https://img.shields.io/badge/mac%20os-000000?style=for-the-badge&logo=macos&logoColor=F0F0F0)
 
 # VBAN Sendtext
 
@@ -23,10 +24,10 @@ For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 
 ## Tested against
 
--   Basic 1.1.1.9
--   Banana 2.1.1.9
--   Potato 3.1.1.9
--   Matrix 1.0.1.2
+-   Basic 1.1.2.2
+-   Banana 2.1.2.2
+-   Potato 3.1.2.2
+-   Matrix 1.0.2.6
 
 ---
 
