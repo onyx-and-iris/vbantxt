@@ -20,6 +20,19 @@ import (
 
 var version string // Version will be set at build time
 
+// versionFromBuild retrieves the version information from the build metadata.
+func versionFromBuild() string {
+	if version != "" {
+		return version
+	}
+
+	info, ok := debug.ReadBuildInfo()
+	if !ok {
+		return "(unable to read version)"
+	}
+	return strings.Split(info.Main.Version, "-")[0]
+}
+
 // Flags holds the command-line flags for the VBANTXT client.
 type Flags struct {
 	Host       string
@@ -147,19 +160,6 @@ func run() (func(), error) {
 	sendCommands(client, commands)
 
 	return closer, nil
-}
-
-// versionFromBuild retrieves the version information from the build metadata.
-func versionFromBuild() string {
-	if version != "" {
-		return version
-	}
-
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return "(unable to read version)"
-	}
-	return strings.Split(info.Main.Version, "-")[0]
 }
 
 // createClient creates a new vban client with the provided options.
