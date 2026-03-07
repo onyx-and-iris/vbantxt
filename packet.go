@@ -10,6 +10,7 @@ import (
 
 const (
 	vbanProtocolTxt = 0x40
+	vbanTxtUtf8     = 0x10
 	streamNameSz    = 16
 	headerSz        = 4 + 1 + 1 + 1 + 1 + 16 + 4
 )
@@ -59,7 +60,7 @@ func newPacket(streamname string) (packet, error) {
 
 // sr defines the samplerate for the request.
 func (p *packet) sr() byte {
-	return byte(vbanProtocolTxt + p.bpsIndex)
+	return byte(p.bpsIndex | vbanProtocolTxt)
 }
 
 // nbc defines the channel of the request.
@@ -74,7 +75,7 @@ func (p *packet) header() []byte {
 	p.hbuf.WriteByte(p.sr())
 	p.hbuf.WriteByte(byte(0))
 	p.hbuf.WriteByte(p.nbc())
-	p.hbuf.WriteByte(byte(0x10))
+	p.hbuf.WriteByte(byte(vbanTxtUtf8))
 	p.hbuf.Write(p.streamname[:])
 
 	var frameBytes [4]byte
