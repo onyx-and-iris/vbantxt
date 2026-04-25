@@ -152,7 +152,7 @@ func run() (func(), error) {
 
 		if err := fs.WalkFlags(mff.FFlagVisitor(manPage)); err != nil {
 			fmt.Fprintln(os.Stderr, err)
-			os.Exit(1)
+			return nil, fmt.Errorf("failed to build man page: %w", err)
 		}
 
 		fmt.Println(manPage.Build(roff.NewDocument()))
