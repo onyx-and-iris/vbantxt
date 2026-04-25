@@ -98,6 +98,7 @@ FLAGS
   -C, --config STRING       Path to the configuration file (default: $XDG_CONFIG_HOME/vbantxt/config.toml)
   -l, --loglevel STRING     Log level (debug, info, warn, error, fatal, panic) (default: warn)
   -v, --version             Show version information
+  -m, --man                 Print man page and exit
 ```
 
 Pass --host, --port and --streamname as flags on the root command, for example:

@@ -11,7 +11,13 @@ Before any major/minor/patch bump all unit tests will be run to verify they pass
 
 -   [x]
 
-# [0.6.0] - 2025-02-14
+# [0.7.0] - 2026-04-25
+
+### Added
+
+- --man flag for man page generation.
+
+# [0.6.0] - 2026-02-14
 
 ### Added
 

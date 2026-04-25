@@ -3,7 +3,10 @@ module github.com/onyx-and-iris/vbantxt
 go 1.25.0
 
 require (
+	github.com/StevenACoffman/mango-ff v0.0.0-20260411205343-7f039223efef
 	github.com/charmbracelet/log v1.0.0
+	github.com/muesli/mango v0.2.0
+	github.com/muesli/roff v0.1.0
 	github.com/peterbourgon/ff/v4 v4.0.0-beta.1
 	github.com/stretchr/testify v1.11.1
 )

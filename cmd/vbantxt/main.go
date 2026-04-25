@@ -10,7 +10,10 @@ import (
 	"strings"
 	"time"
 
+	mff "github.com/StevenACoffman/mango-ff"
 	"github.com/charmbracelet/log"
+	"github.com/muesli/mango"
+	"github.com/muesli/roff"
 	"github.com/peterbourgon/ff/v4"
 	"github.com/peterbourgon/ff/v4/ffhelp"
 	"github.com/peterbourgon/ff/v4/fftoml"
@@ -44,6 +47,7 @@ type Flags struct {
 	ConfigPath string // Path to the configuration file
 	Loglevel   string // Log level
 	Version    bool   // Version flag
+	Man        bool   // Print the man page to stdout and exit
 }
 
 func (f *Flags) String() string {
@@ -118,6 +122,7 @@ func run() (func(), error) {
 		"Log level (debug, info, warn, error, fatal, panic)",
 	)
 	fs.BoolVar(&flags.Version, 'v', "version", "Show version information")
+	fs.BoolVar(&flags.Man, 'm', "man", "Print man page and exit")
 
 	err = ff.Parse(fs, os.Args[1:],
 		ff.WithEnvVarPrefix("VBANTXT"),
@@ -135,6 +140,22 @@ func run() (func(), error) {
 
 	if flags.Version {
 		fmt.Printf("vbantxt version: %s\n", versionFromBuild())
+		return nil, nil
+	}
+
+	if flags.Man {
+		manPage := mango.NewManPage(
+			1,
+			"vbantxt",
+			"A command-line tool for sending text requests over VBAN",
+		)
+
+		if err := fs.WalkFlags(mff.FFlagVisitor(manPage)); err != nil {
+			fmt.Fprintln(os.Stderr, err)
+			os.Exit(1)
+		}
+
+		fmt.Println(manPage.Build(roff.NewDocument()))
 		return nil, nil
 	}
 
