@@ -151,7 +151,6 @@ func run() (func(), error) {
 		)
 
 		if err := fs.WalkFlags(mff.FFlagVisitor(manPage)); err != nil {
-			fmt.Fprintln(os.Stderr, err)
 			return nil, fmt.Errorf("failed to build man page: %w", err)
 		}
 
