@@ -1,6 +1,6 @@
 module github.com/onyx-and-iris/vbantxt
 
-go 1.25.0
+go 1.26.0
 
 require (
 	github.com/StevenACoffman/mango-ff v0.0.0-20260411205343-7f039223efef
@@ -25,13 +25,13 @@ require (
 	github.com/kr/pretty v0.1.0 // indirect
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-isatty v0.0.24 // indirect
-	github.com/mattn/go-runewidth v0.0.27 // indirect
+	github.com/mattn/go-runewidth v0.0.28 // indirect
 	github.com/muesli/termenv v0.16.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.4.3 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v1.0.0 // indirect
-	golang.org/x/exp v0.0.0-20260813180055-c1d0aacb2297 // indirect
+	golang.org/x/exp v0.0.0-20260820142414-ca536658362e // indirect
 	golang.org/x/sys v0.47.0 // indirect
 	gopkg.in/check.v1 v1.0.0-20180628173108-788fd7840127 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
