@@ -57,7 +57,7 @@ func (h *VbanRTRequestHeader) streamname() [StreamnameMaxLength]byte {
 	return out
 }
 
-// ToBytes encodes the header exactly like Python struct.pack("<4s4B16sI").
+// ToBytes encodes the header into a byte slice suitable for transmission.
 func (h *VbanRTRequestHeader) ToBytes(framecounter uint32) []byte {
 	buf := make([]byte, 4+4+16+4) // 4s4B16sI
 

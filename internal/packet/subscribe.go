@@ -28,7 +28,7 @@ func (h *VbanRTSubscribeHeader) Streamname() [StreamnameMaxLength]byte {
 	return out
 }
 
-// ToBytes serializes the subscription header into a byte slice suitable for sending over the network.
+// ToBytes serialises the subscription header into a byte slice suitable for sending over the network.
 func (h *VbanRTSubscribeHeader) ToBytes(framecounter uint32) []byte {
 	buf := make([]byte, 4+4+16+4)
 

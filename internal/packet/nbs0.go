@@ -4,6 +4,7 @@ import (
 	"bytes"
 )
 
+// VbanRTPacketNBS0 represents the body of an RTPacket with ident:0.
 type VbanRTPacketNBS0 struct {
 	Hdr VbanRTPacketHeader
 

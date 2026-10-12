@@ -32,13 +32,10 @@ func ParseVbanRTPacketNBS1(nbs NBS, data []byte) (*VbanRTPacketNBS1, error) {
 
 	// How many full strips are actually present in the packet?
 	body := len(data) - base
-	stripCount := body / VMPARAMSTRIP_SIZE
-	if stripCount > 16 {
-		stripCount = 16
-	}
+	stripCount := min(body/VMPARAMSTRIP_SIZE, 16)
 
 	// Parse only the strips that exist
-	for i := 0; i < stripCount; i++ {
+	for i := range stripCount {
 		start := base + i*VMPARAMSTRIP_SIZE
 		end := start + VMPARAMSTRIP_SIZE
 
@@ -50,6 +47,6 @@ func ParseVbanRTPacketNBS1(nbs NBS, data []byte) (*VbanRTPacketNBS1, error) {
 		p.Strip[i] = ParseVbanVMParamStrip(data[start:end])
 	}
 
-	// Remaining strips stay zero-valued (same behavior as Python)
+	// Remaining strips stay zero-valued
 	return p, nil
 }
