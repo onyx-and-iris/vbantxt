@@ -221,5 +221,11 @@ func ParseVbanRTPacketNBS0(nbs NBS, data []byte) (*VbanRTPacketNBS0, error) {
 		p.StripGain[strip] = maxVal
 	}
 
+	rawBusGain := data[436:452]
+	for bus := 0; bus < 8; bus++ {
+		v := int16(rawBusGain[bus*2]) | int16(rawBusGain[bus*2+1])<<8
+		p.BusGain[bus] = float64(v) * 0.01
+	}
+
 	return p, nil
 }
