@@ -39,11 +39,16 @@ type CLI struct {
 }
 
 type RawCmd struct {
-	Payload string `arg:"" help:"Raw VBAN-TXT payload"`
+	Payload []string `arg:"" help:"One or more raw VBAN-TXT payloads."`
 }
 
 func (cmd *RawCmd) Run(ctx *appContext) error {
-	return ctx.Client.SendTXT(ctx.Ctx, cmd.Payload)
+	for _, cmd := range cmd.Payload {
+		if err := ctx.Client.SendTXT(ctx.Ctx, cmd); err != nil {
+			logging.Errorf("Failed to send VBAN-TXT payload: %v", err)
+		}
+	}
+	return nil
 }
 
 func main() {
