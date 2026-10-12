@@ -9,119 +9,148 @@ const VMPARAMSTRIP_SIZE = 174
 
 type VbanVMParamStrip struct {
 	Mode       uint32
-	DBLevel    int32
-	Audibility int16
-	Pos3DX     int16
-	Pos3DY     int16
-	PosColorX  int16
-	PosColorY  int16
-	EQGain1    int16
-	EQGain2    int16
-	EQGain3    int16
+	DBLevel    float64
+	Audibility float64
 
-	PEQ_On   [6]uint8
+	Pos3DX    float64
+	Pos3DY    float64
+	PosColorX float64
+	PosColorY float64
+
+	EQGain1 float64
+	EQGain2 float64
+	EQGain3 float64
+
+	PEQ_On   [6]bool
 	PEQ_Type [6]uint8
-	PEQ_Gain [6]float32
-	PEQ_Freq [6]float32
-	PEQ_Q    [6]float32
+	PEQ_Gain [6]float64
+	PEQ_Freq [6]float64
+	PEQ_Q    [6]float64
 
-	AudibilityC int16
-	AudibilityG int16
-	AudibilityD int16
-	PosModX     int16
-	PosModY     int16
-	SendReverb  int16
-	SendDelay   int16
-	SendFX1     int16
-	SendFX2     int16
-	DBLimit     int16
-	Karaoke     int16
+	AudibilityC float64
+	AudibilityG float64
+	AudibilityD float64
 
-	CompGainIn    int16
-	CompAttackMS  int16
-	CompReleaseMS int16
-	CompNKnee     int16
-	CompRate      int16
-	CompThreshold int16
-	CompEnabled   uint16
-	CompAuto      uint16
-	CompGainOut   int16
+	PosModX float64
+	PosModY float64
 
-	GateThreshold int16
-	GateDamping   int16
-	GateSidechain uint16
-	GateAttackMS  int16
-	GateHoldMS    int16
-	GateReleaseMS int16
+	SendReverb float64
+	SendDelay  float64
+	SendFX1    float64
+	SendFX2    float64
 
-	DenoiserThreshold int16
-	PitchEnabled      uint16
-	PitchDryWet       int16
-	PitchValue        int16
-	PitchFormantLo    int16
-	PitchFormantMed   int16
-	PitchFormantHigh  int16
+	DBLimit float64
+	Karaoke float64
+
+	CompGainIn    float64
+	CompAttackMS  float64
+	CompReleaseMS float64
+	CompNKnee     float64
+	CompRate      float64
+	CompThreshold float64
+	CompEnabled   bool
+	CompAuto      bool
+	CompGainOut   float64
+
+	GateThreshold float64
+	GateDamping   float64
+	GateSidechain float64
+	GateAttackMS  float64
+	GateHoldMS    float64
+	GateReleaseMS float64
+
+	DenoiserThreshold float64
+
+	PitchEnabled     bool
+	PitchDryWet      float64
+	PitchValue       float64
+	PitchFormantLo   float64
+	PitchFormantMed  float64
+	PitchFormantHigh float64
+}
+
+func f16(b0, b1 byte) float64 {
+	v := int16(b0) | int16(b1)<<8
+	return float64(v) * 0.01
+}
+
+func f32(b []byte) float64 {
+	return float64(math.Float32frombits(binary.LittleEndian.Uint32(b)))
 }
 
 func ParseVbanVMParamStrip(data []byte) VbanVMParamStrip {
 	p := VbanVMParamStrip{}
 
 	p.Mode = binary.LittleEndian.Uint32(data[0:4])
-	p.DBLevel = int32(binary.LittleEndian.Uint32(data[4:8]))
-	p.Audibility = int16(binary.LittleEndian.Uint16(data[8:10]))
-	p.Pos3DX = int16(binary.LittleEndian.Uint16(data[10:12]))
-	p.Pos3DY = int16(binary.LittleEndian.Uint16(data[12:14]))
-	p.PosColorX = int16(binary.LittleEndian.Uint16(data[14:16]))
-	p.PosColorY = int16(binary.LittleEndian.Uint16(data[16:18]))
-	p.EQGain1 = int16(binary.LittleEndian.Uint16(data[18:20]))
-	p.EQGain2 = int16(binary.LittleEndian.Uint16(data[20:22]))
-	p.EQGain3 = int16(binary.LittleEndian.Uint16(data[22:24]))
+	p.DBLevel = f16(data[4], data[5]) // Python treats dblevel as float
+	p.Audibility = f16(data[8], data[9])
 
-	copy(p.PEQ_On[:], data[24:30])
-	copy(p.PEQ_Type[:], data[30:36])
+	p.Pos3DX = f16(data[10], data[11])
+	p.Pos3DY = f16(data[12], data[13])
+	p.PosColorX = f16(data[14], data[15])
+	p.PosColorY = f16(data[16], data[17])
 
-	for i := 0; i < 6; i++ {
-		p.PEQ_Gain[i] = math.Float32frombits(binary.LittleEndian.Uint32(data[36+i*4 : 40+i*4]))
-		p.PEQ_Freq[i] = math.Float32frombits(binary.LittleEndian.Uint32(data[60+i*4 : 64+i*4]))
-		p.PEQ_Q[i] = math.Float32frombits(binary.LittleEndian.Uint32(data[84+i*4 : 88+i*4]))
+	p.EQGain1 = f16(data[18], data[19])
+	p.EQGain2 = f16(data[20], data[21])
+	p.EQGain3 = f16(data[22], data[23])
+
+	// PEQ On (6 bytes)
+	for i := range 6 {
+		p.PEQ_On[i] = data[24+i] != 0
 	}
 
-	p.AudibilityC = int16(binary.LittleEndian.Uint16(data[108:110]))
-	p.AudibilityG = int16(binary.LittleEndian.Uint16(data[110:112]))
-	p.AudibilityD = int16(binary.LittleEndian.Uint16(data[112:114]))
-	p.PosModX = int16(binary.LittleEndian.Uint16(data[114:116]))
-	p.PosModY = int16(binary.LittleEndian.Uint16(data[116:118]))
-	p.SendReverb = int16(binary.LittleEndian.Uint16(data[118:120]))
-	p.SendDelay = int16(binary.LittleEndian.Uint16(data[120:122]))
-	p.SendFX1 = int16(binary.LittleEndian.Uint16(data[122:124]))
-	p.SendFX2 = int16(binary.LittleEndian.Uint16(data[124:126]))
-	p.DBLimit = int16(binary.LittleEndian.Uint16(data[126:128]))
-	p.Karaoke = int16(binary.LittleEndian.Uint16(data[128:130]))
+	// PEQ Type (6 bytes)
+	copy(p.PEQ_Type[:], data[30:36])
 
-	p.CompGainIn = int16(binary.LittleEndian.Uint16(data[130:132]))
-	p.CompAttackMS = int16(binary.LittleEndian.Uint16(data[132:134]))
-	p.CompReleaseMS = int16(binary.LittleEndian.Uint16(data[134:136]))
-	p.CompNKnee = int16(binary.LittleEndian.Uint16(data[136:138]))
-	p.CompRate = int16(binary.LittleEndian.Uint16(data[138:140]))
-	p.CompThreshold = int16(binary.LittleEndian.Uint16(data[140:142]))
-	p.CompEnabled = binary.LittleEndian.Uint16(data[142:144])
-	p.CompAuto = binary.LittleEndian.Uint16(data[144:146])
-	p.CompGainOut = int16(binary.LittleEndian.Uint16(data[146:148]))
+	// PEQ Gain (6 floats)
+	for i := range 6 {
+		p.PEQ_Gain[i] = f32(data[36+i*4 : 40+i*4])
+		p.PEQ_Freq[i] = f32(data[60+i*4 : 64+i*4])
+		p.PEQ_Q[i] = f32(data[84+i*4 : 88+i*4])
+	}
 
-	p.GateThreshold = int16(binary.LittleEndian.Uint16(data[148:150]))
-	p.GateDamping = int16(binary.LittleEndian.Uint16(data[150:152]))
-	p.GateSidechain = binary.LittleEndian.Uint16(data[152:154])
-	p.GateAttackMS = int16(binary.LittleEndian.Uint16(data[154:156]))
-	p.GateHoldMS = int16(binary.LittleEndian.Uint16(data[156:158]))
-	p.GateReleaseMS = int16(binary.LittleEndian.Uint16(data[158:160]))
+	p.AudibilityC = f16(data[108], data[109])
+	p.AudibilityG = f16(data[110], data[111])
+	p.AudibilityD = f16(data[112], data[113])
 
-	p.DenoiserThreshold = int16(binary.LittleEndian.Uint16(data[160:162]))
-	p.PitchEnabled = binary.LittleEndian.Uint16(data[162:164])
-	p.PitchDryWet = int16(binary.LittleEndian.Uint16(data[164:166]))
-	p.PitchValue = int16(binary.LittleEndian.Uint16(data[166:168]))
-	p.PitchFormantLo = int16(binary.LittleEndian.Uint16(data[168:170]))
-	p.PitchFormantMed = int16(binary.LittleEndian.Uint16(data[170:172]))
-	p.PitchFormantHigh = int16(binary.LittleEndian.Uint16(data[172:174]))
+	p.PosModX = f16(data[114], data[115])
+	p.PosModY = f16(data[116], data[117])
+
+	p.SendReverb = f16(data[118], data[119])
+	p.SendDelay = f16(data[120], data[121])
+	p.SendFX1 = f16(data[122], data[123])
+	p.SendFX2 = f16(data[124], data[125])
+
+	p.DBLimit = f16(data[126], data[127])
+	p.Karaoke = f16(data[128], data[129])
+
+	p.CompGainIn = f16(data[130], data[131])
+	p.CompAttackMS = f16(data[132], data[133])
+	p.CompReleaseMS = f16(data[134], data[135])
+	p.CompNKnee = f16(data[136], data[137])
+	p.CompRate = f16(data[138], data[139])
+	p.CompThreshold = f16(data[140], data[141])
+
+	p.CompEnabled = data[142] != 0
+	p.CompAuto = data[144] != 0
+
+	p.CompGainOut = f16(data[146], data[147])
+
+	p.GateThreshold = f16(data[148], data[149])
+	p.GateDamping = f16(data[150], data[151])
+	p.GateSidechain = f16(data[152], data[153])
+	p.GateAttackMS = f16(data[154], data[155])
+	p.GateHoldMS = f16(data[156], data[157])
+	p.GateReleaseMS = f16(data[158], data[159])
+
+	p.DenoiserThreshold = f16(data[160], data[161])
+
+	p.PitchEnabled = data[162] != 0
+	p.PitchDryWet = f16(data[164], data[165])
+	p.PitchValue = f16(data[166], data[167])
+	p.PitchFormantLo = f16(data[168], data[169])
+	p.PitchFormantMed = f16(data[170], data[171])
+	p.PitchFormantHigh = f16(data[172], data[173])
 
 	return p
 }
