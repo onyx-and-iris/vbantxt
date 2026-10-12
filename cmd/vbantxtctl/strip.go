@@ -9,11 +9,12 @@ import (
 // StripCmdGroup defines the command group for controlling a specific strip, including its mute state and EQ settings.
 type StripCmdGroup struct {
 	Index struct {
-		Index int          `arg:"" help:"The index of the strip. (0-based indexing)"`
-		Mono  StripMonoCmd `cmd:""       help:"Get or set the mono state of the strip."`
-		Solo  StripSoloCmd `cmd:""       help:"Get or set the solo state of the strip."`
-		Mute  StripMuteCmd `cmd:""       help:"Get or set the mute state of the strip."`
-		Gain  StripGainCmd `cmd:""       help:"Get or set the gain of the strip."`
+		Index int           `arg:"" help:"The index of the strip. (0-based indexing)"`
+		Mono  StripMonoCmd  `cmd:""       help:"Get or set the mono state of the strip."`
+		Solo  StripSoloCmd  `cmd:""       help:"Get or set the solo state of the strip."`
+		Mute  StripMuteCmd  `cmd:""       help:"Get or set the mute state of the strip."`
+		Gain  StripGainCmd  `cmd:""       help:"Get or set the gain of the strip."`
+		Label StripLabelCmd `cmd:""       help:"Get or set the label of the strip."`
 
 		A1 StripA1Cmd `cmd:""       help:"Get or set the A1 state of the strip." name:"a1"`
 		A2 StripA2Cmd `cmd:""       help:"Get or set the A2 state of the strip." name:"a2"`
@@ -142,8 +143,8 @@ func (cmd *StripGainCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		}
 
 		p := pkt.(*packet.VbanRTPacketNBS0)
-		v := p.StripGain[idx]
-		fmt.Fprintf(ctx.Out, "strip %d gain: %f\n", idx, v)
+		gain := p.StripGain[idx]
+		fmt.Fprintf(ctx.Out, "strip %d gain: %f\n", idx, gain)
 		return nil
 	}
 
@@ -155,10 +156,12 @@ func (cmd *StripGainCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripA1Cmd defines the command for getting or setting the A1 state of a strip.
 type StripA1Cmd struct {
 	State *string `arg:"" help:"The A1 state to set (true or false). If not provided, the current A1 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripA1Cmd command, either retrieving the current A1 state of the strip or setting it based on the provided argument.
 func (cmd *StripA1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -186,10 +189,12 @@ func (cmd *StripA1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripA2Cmd defines the command for getting or setting the A2 state of a strip.
 type StripA2Cmd struct {
 	State *string `arg:"" help:"The A2 state to set (true or false). If not provided, the current A2 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripA2Cmd command, either retrieving the current A2 state of the strip or setting it based on the provided argument.
 func (cmd *StripA2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -217,10 +222,12 @@ func (cmd *StripA2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripA3Cmd defines the command for getting or setting the A3 state of a strip.
 type StripA3Cmd struct {
 	State *string `arg:"" help:"The A3 state to set (true or false). If not provided, the current A3 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripA3Cmd command, either retrieving the current A3 state of the strip or setting it based on the provided argument.
 func (cmd *StripA3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -248,10 +255,12 @@ func (cmd *StripA3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripA4Cmd defines the command for getting or setting the A4 state of a strip.
 type StripA4Cmd struct {
 	State *string `arg:"" help:"The A4 state to set (true or false). If not provided, the current A4 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripA4Cmd command, either retrieving the current A4 state of the strip or setting it based on the provided argument.
 func (cmd *StripA4Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -279,10 +288,12 @@ func (cmd *StripA4Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripA5Cmd defines the command for getting or setting the A5 state of a strip.
 type StripA5Cmd struct {
 	State *string `arg:"" help:"The A5 state to set (true or false). If not provided, the current A5 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripA5Cmd command, either retrieving the current A5 state of the strip or setting it based on the provided argument.
 func (cmd *StripA5Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -310,10 +321,12 @@ func (cmd *StripA5Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripB1Cmd defines the command for getting or setting the B1 state of a strip.
 type StripB1Cmd struct {
 	State *string `arg:"" help:"The B1 state to set (true or false). If not provided, the current B1 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripB1Cmd command, either retrieving the current B1 state of the strip or setting it based on the provided argument.
 func (cmd *StripB1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -341,10 +354,12 @@ func (cmd *StripB1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripB2Cmd defines the command for getting or setting the B2 state of a strip.
 type StripB2Cmd struct {
 	State *string `arg:"" help:"The B2 state to set (true or false). If not provided, the current B2 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripB2Cmd command, either retrieving the current B2 state of the strip or setting it based on the provided argument.
 func (cmd *StripB2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -372,10 +387,12 @@ func (cmd *StripB2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	return nil
 }
 
+// StripB3Cmd defines the command for getting or setting the B3 state of a strip.
 type StripB3Cmd struct {
 	State *string `arg:"" help:"The B3 state to set (true or false). If not provided, the current B3 state will be returned." optional:"" enum:"true,false"`
 }
 
+// Run executes the StripB3Cmd command, either retrieving the current B3 state of the strip or setting it based on the provided argument.
 func (cmd *StripB3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
@@ -400,5 +417,33 @@ func (cmd *StripB3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		return fmt.Errorf("failed to set B3 state: %w", err)
 	}
 	fmt.Fprintf(ctx.Out, "strip %d B3 set: %t\n", idx, *cmd.State == "true")
+	return nil
+}
+
+// StripLabelCmd defines the command for getting or setting the label of a strip.
+type StripLabelCmd struct {
+	Label *string `arg:"" help:"The label to set for the strip. If not provided, the current label will be returned." optional:""`
+}
+
+// Run executes the StripLabelCmd command, either retrieving the current label of the strip or setting it based on the provided argument.
+func (cmd *StripLabelCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
+	idx := strip.Index.Index
+
+	if cmd.Label == nil {
+		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSZero)
+		if err != nil {
+			return err
+		}
+
+		p := pkt.(*packet.VbanRTPacketNBS0)
+		v := p.Labels().Strip[idx]
+		fmt.Fprintf(ctx.Out, "strip %d label: %s\n", idx, v)
+		return nil
+	}
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].Label=\"%s\"", idx, *cmd.Label)); err != nil {
+		return fmt.Errorf("failed to set label: %w", err)
+	}
+	fmt.Fprintf(ctx.Out, "strip %d label set: %s\n", idx, *cmd.Label)
 	return nil
 }
