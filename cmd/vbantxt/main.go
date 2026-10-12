@@ -1,214 +1,110 @@
-// Package main implements a command-line tool for sending text messages over VBAN using the vbantxt library.
 package main
 
 import (
-	"errors"
+	"context"
 	"fmt"
+	"io"
 	"os"
-	"path/filepath"
-	"runtime/debug"
-	"strings"
-	"time"
-
-	mff "github.com/StevenACoffman/mango-ff"
-	"github.com/charmbracelet/log"
-	"github.com/muesli/mango"
-	"github.com/muesli/roff"
-	"github.com/peterbourgon/ff/v4"
-	"github.com/peterbourgon/ff/v4/ffhelp"
-	"github.com/peterbourgon/ff/v4/fftoml"
 
 	"github.com/onyx-and-iris/vbantxt"
+	"github.com/onyx-and-iris/vbantxt/internal/logging"
+
+	"github.com/alecthomas/kong"
+	kongtoml "github.com/alecthomas/kong-toml"
 )
 
-var version string // Version will be set at build time
-
-// versionFromBuild retrieves the version information from the build metadata.
-func versionFromBuild() string {
-	if version != "" {
-		return version
-	}
-
-	info, ok := debug.ReadBuildInfo()
-	if !ok {
-		return "(unable to read version)"
-	}
-	return strings.Split(info.Main.Version, "-")[0]
+type appContext struct {
+	Ctx    context.Context
+	Client *vbantxt.Client
+	Out    io.Writer
 }
 
-// Flags holds the command-line flags for the VBANTXT client.
-type Flags struct {
-	Host       string
-	Port       int
-	Streamname string
-	Bps        int
-	Channel    int
-	Ratelimit  int
-	ConfigPath string // Path to the configuration file
-	Loglevel   string // Log level
-	Version    bool   // Version flag
-	Man        bool   // Print the man page to stdout and exit
+type CLIConfig struct {
+	Config   string `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH"`
+	LogLevel string `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOGLEVEL"    enum:"trace,debug,info,warn,error,fatal"`
 }
 
-func (f *Flags) String() string {
-	return fmt.Sprintf(
-		"Host: %s, Port: %d, Streamname: %s, Bps: %d, Channel: %d, Ratelimit: %dms, ConfigPath: %s, Loglevel: %s",
-		f.Host,
-		f.Port,
-		f.Streamname,
-		f.Bps,
-		f.Channel,
-		f.Ratelimit,
-		f.ConfigPath,
-		f.Loglevel,
-	)
+type CLI struct {
+	CLIConfig  CLIConfig          `embed:"" help:"CLI configuration"  group:"CLI"`
+	VBANConfig vbantxt.VBANConfig `embed:"" help:"VBAN configuration" group:"VBAN"`
+
+	RawCmd `arg:"" help:"Send raw VBAN-TXT payload."`
 }
 
-// main is the entry point of the application.
-// It sets up a deferred function to handle exiting with the appropriate exit code
-// and calls the run function to execute the main logic.
+type RawCmd struct {
+	Payload string `arg:"" help:"Raw VBAN-TXT payload"`
+}
+
+func (cmd *RawCmd) Run(ctx *appContext) error {
+	return ctx.Client.SendTXT(ctx.Ctx, cmd.Payload)
+}
+
 func main() {
-	var exitCode int
+	var cli CLI
 
-	// Defer exit with the final exit code
-	defer func() {
-		if exitCode != 0 {
-			os.Exit(exitCode)
-		}
-	}()
+	initialParser, _ := buildInitialParser(&cli)
+	configFromCLI, _ := extractConfigPath(initialParser, &cli)
 
-	closer, err := run()
-	if closer != nil {
-		defer closer()
-	}
-	if err != nil {
-		log.Error(err)
-		exitCode = 1
-	}
+	ctx := kong.Parse(
+		&cli,
+		kong.Configuration(kongtoml.Loader, configFromCLI, "/etc/vbantxt/app.toml"),
+	)
+
+	ctx.FatalIfErrorf(run(ctx, cli.CLIConfig, cli.VBANConfig))
 }
 
-// run contains the main application logic and returns a closer function and any error.
-func run() (func(), error) {
-	var flags Flags
-
-	// VBAN specific flags
-	fs := ff.NewFlagSet("vbantxt - A command-line tool for sending text requests over VBAN")
-	fs.StringVar(&flags.Host, 'H', "host", "localhost", "VBAN host")
-	fs.IntVar(&flags.Port, 'p', "port", 6980, "VBAN port")
-	fs.StringVar(&flags.Streamname, 's', "streamname", "Command1", "VBAN stream name")
-	fs.IntVar(&flags.Bps, 'b', "bps", 256000, "VBAN BPS")
-	fs.IntVar(&flags.Channel, 'n', "channel", 0, "VBAN channel")
-	fs.IntVar(&flags.Ratelimit, 'r', "ratelimit", 20, "VBAN rate limit (ms)")
-
-	configDir, err := os.UserConfigDir()
-	if err != nil {
-		return nil, fmt.Errorf("failed to get user config directory: %w", err)
-	}
-	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
-
-	// Configuration file and logging flags
-	fs.StringVar(
-		&flags.ConfigPath,
-		'C',
-		"config",
-		defaultConfigPath,
-		"Path to the configuration file",
+func buildInitialParser(pre *CLI) (*kong.Kong, error) {
+	return kong.New(pre,
+		kong.Name("vbantxtctl"),
+		kong.Description("VBAN-TXT control CLI"),
+		kong.Help(func(options kong.HelpOptions, ctx *kong.Context) error {
+			return nil
+		}),
+		kong.Exit(func(int) {}),
 	)
-	fs.StringVar(
-		&flags.Loglevel,
-		'l',
-		"loglevel",
-		"warn",
-		"Log level (debug, info, warn, error, fatal, panic)",
-	)
-	fs.BoolVar(&flags.Version, 'v', "version", "Show version information")
-	fs.BoolVar(&flags.Man, 'm', "man", "Print man page and exit")
-
-	err = ff.Parse(fs, os.Args[1:],
-		ff.WithEnvVarPrefix("VBANTXT"),
-		ff.WithConfigFileFlag("config"),
-		ff.WithConfigAllowMissingFile(),
-		ff.WithConfigFileParser(fftoml.Parser{Delimiter: "."}.Parse),
-	)
-	switch {
-	case errors.Is(err, ff.ErrHelp):
-		fmt.Fprintf(os.Stderr, "%s\n", ffhelp.Flags(fs, "vbantxt [flags] <vban commands>"))
-		return nil, nil
-	case err != nil:
-		return nil, fmt.Errorf("failed to parse flags: %w", err)
-	}
-
-	if flags.Version {
-		fmt.Printf("vbantxt version: %s\n", versionFromBuild())
-		return nil, nil
-	}
-
-	if flags.Man {
-		manPage := mango.NewManPage(
-			1,
-			"vbantxt",
-			"A command-line tool for sending text requests over VBAN",
-		)
-
-		if err := fs.WalkFlags(mff.FFlagVisitor(manPage)); err != nil {
-			return nil, fmt.Errorf("failed to build man page: %w", err)
-		}
-
-		fmt.Println(manPage.Build(roff.NewDocument()))
-		return nil, nil
-	}
-
-	level, err := log.ParseLevel(flags.Loglevel)
-	if err != nil {
-		return nil, fmt.Errorf("invalid log level %q", flags.Loglevel)
-	}
-	log.SetLevel(level)
-
-	log.Debugf("Loaded configuration: %s", flags.String())
-
-	client, closer, err := createClient(&flags)
-	if err != nil {
-		return nil, fmt.Errorf("failed to create VBAN client: %w", err)
-	}
-
-	commands := fs.GetArgs()
-	if len(commands) == 0 {
-		return closer, errors.New(
-			"no VBAN commands provided; please provide at least one command as an argument",
-		)
-	}
-	sendCommands(client, commands)
-
-	return closer, nil
 }
 
-// createClient creates a new vban client with the provided options.
-func createClient(flags *Flags) (*vbantxt.VbanTxt, func(), error) {
+func extractConfigPath(parser *kong.Kong, pre *CLI) (string, error) {
+	if _, err := parser.Parse(os.Args[1:]); err != nil {
+		return pre.CLIConfig.Config, fmt.Errorf("failed to parse CLI arguments: %w", err)
+	}
+	return pre.CLIConfig.Config, nil
+}
+
+func run(ctx *kong.Context, cliConfig CLIConfig, vbanConfig vbantxt.VBANConfig) error {
+	loglevel, err := logging.ParseLevel(cliConfig.LogLevel)
+	if err != nil {
+		return fmt.Errorf("invalid log level: %w", err)
+	}
+	logging.SetLevel(loglevel)
+
+	client, err := initialise(vbanConfig)
+	if err != nil {
+		return err
+	}
+	defer client.Close()
+
+	ctx.Bind(&appContext{
+		Ctx:    context.Background(),
+		Client: client,
+		Out:    ctx.Stdout,
+	})
+
+	return ctx.Run()
+}
+
+func initialise(cfg vbantxt.VBANConfig) (*vbantxt.Client, error) {
 	client, err := vbantxt.New(
-		flags.Host,
-		flags.Port,
-		flags.Streamname,
-		vbantxt.WithBPSOpt(flags.Bps),
-		vbantxt.WithChannel(flags.Channel),
-		vbantxt.WithRateLimit(time.Duration(flags.Ratelimit)*time.Millisecond))
+		cfg.Host,
+		cfg.Port,
+		cfg.Streamname,
+		vbantxt.WithRateLimit(cfg.RateLimit),
+		vbantxt.WithBPSOpt(cfg.BPS),
+		vbantxt.WithChannel(cfg.Channel),
+	)
 	if err != nil {
-		return nil, nil, err
+		return nil, err
 	}
 
-	closer := func() {
-		if err := client.Close(); err != nil {
-			log.Error(err)
-		}
-	}
-
-	return client, closer, nil
-}
-
-// sendCommands sends the provided VBAN commands using the client and logs any errors that occur.
-func sendCommands(client *vbantxt.VbanTxt, commands []string) {
-	for _, cmd := range commands {
-		if err := client.Send(cmd); err != nil {
-			log.Errorf("Failed to send command '%s': %v", cmd, err)
-		}
-	}
+	return client, nil
 }
