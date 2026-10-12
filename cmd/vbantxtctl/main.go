@@ -24,7 +24,7 @@ type appContext struct {
 
 type CLIConfig struct {
 	Config   string        `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH"`
-	Timeout  time.Duration `flag:"" default:"2s"           help:"Timeout for RT operations."`
+	Timeout  time.Duration `flag:"" default:"2s"           help:"Timeout for RT operations."          env:"VBANTXT_CLI_TIMEOUT"`
 	LogLevel string        `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOG_LEVEL"   enum:"trace,debug,info,warn,error,fatal"`
 }
 

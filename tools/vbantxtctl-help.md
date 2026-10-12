@@ -6,7 +6,7 @@ Flags:
 
 CLI
   --config="vbantxt.toml"    Path to the CLI configuration file ($VBANTXT_CLI_CONFIG_PATH).
-  --timeout=2s               Timeout for RT operations.
+  --timeout=2s               Timeout for RT operations ($VBANTXT_CLI_TIMEOUT).
   --log-level="info"         Log level for the CLI ($VBANTXT_CLI_LOG_LEVEL).
 
 VBAN
