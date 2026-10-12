@@ -28,7 +28,7 @@ vars:
 
 tasks:
   default:
-    desc: Build the vbantxt project
+    desc: Build the vbantxt and vbantxtctl project
     cmds:
       - task: build
 
