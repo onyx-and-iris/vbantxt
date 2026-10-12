@@ -93,7 +93,7 @@ func (cmd *StripEqCellOnCmd) Run(
 		}
 
 		p := pkt.(*packet.VbanRTPacketNBS1)
-		on := p.Strip[idx].PEQ_On[cell.Index.Index] != 0
+		on := p.Strip[idx].PEQ_On[cell.Index.Index]
 
 		fmt.Fprintf(
 			ctx.Out,
