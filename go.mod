@@ -7,6 +7,8 @@ require (
 	charm.land/log/v2 v2.0.1
 	github.com/alecthomas/kong v1.16.1
 	github.com/alecthomas/kong-toml v0.4.1
+	github.com/alecthomas/mango-kong v0.1.0
+	github.com/muesli/roff v0.1.0
 )
 
 require (
@@ -22,6 +24,7 @@ require (
 	github.com/lucasb-eyer/go-colorful v1.4.1 // indirect
 	github.com/mattn/go-runewidth v0.0.30 // indirect
 	github.com/muesli/cancelreader v0.2.2 // indirect
+	github.com/muesli/mango v0.1.1-0.20220205060214-77e2058169ab // indirect
 	github.com/pelletier/go-toml v1.9.5 // indirect
 	github.com/rivo/uniseg v0.4.7 // indirect
 	github.com/xo/terminfo v1.2.0 // indirect

@@ -8,11 +8,12 @@ Arguments:
 
 Flags:
   -h, --help       Show context-sensitive help.
+      --man        Print man page.
   -v, --version    Print vbantxt version information and quit
 
 CLI
-  --config="vbantxt.toml"    Path to the CLI configuration file ($VBANTXT_CLI_CONFIG_PATH).
-  --log-level="info"         Log level for the CLI ($VBANTXT_CLI_LOG_LEVEL).
+  -C, --config="vbantxt.toml"    Path to the CLI configuration file ($VBANTXT_CLI_CONFIG_PATH).
+      --log-level="info"         Log level for the CLI ($VBANTXT_CLI_LOG_LEVEL).
 
 VBAN
   --host="localhost"         ($VBANTXT_CLI_HOST)

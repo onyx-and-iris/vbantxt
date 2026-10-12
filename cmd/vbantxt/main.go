@@ -11,6 +11,8 @@ import (
 
 	"github.com/alecthomas/kong"
 	kongtoml "github.com/alecthomas/kong-toml"
+	mangokong "github.com/alecthomas/mango-kong"
+	"github.com/muesli/roff"
 
 	"github.com/onyx-and-iris/vbantxt"
 	"github.com/onyx-and-iris/vbantxt/internal/logging"
@@ -24,11 +26,26 @@ type VersionFlag string
 func (v VersionFlag) Decode(_ *kong.DecodeContext) error { return nil }  // nolint: revive
 func (v VersionFlag) IsBool() bool                       { return true } // nolint: revive
 func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error { // nolint: revive, unparam
-	if _, ok := vars["version"]; !ok {
+	if app.Model.Name != "vbantxt" {
 		return nil
 	}
 
-	fmt.Printf("vbantxt version: %s\n", vars["version"])
+	fmt.Fprintf(app.Stdout, "vbantxt version: %s\n", vars["version"])
+	app.Exit(0)
+	return nil
+}
+
+type ManFlag mangokong.ManFlag
+
+func (m ManFlag) Decode(_ *kong.DecodeContext) error { return nil }  // nolint: revive
+func (m ManFlag) IsBool() bool                       { return true } // nolint: revive
+func (m ManFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error { // nolint: revive, unparam
+	if app.Model.Name != "vbantxt" {
+		return nil
+	}
+
+	man := mangokong.NewManPage(1, app.Model)
+	fmt.Fprint(app.Stdout, man.Build(roff.NewDocument()))
 	app.Exit(0)
 	return nil
 }
@@ -40,14 +57,15 @@ type appContext struct {
 }
 
 type CLIConfig struct {
-	Config   string `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH"`
-	LogLevel string `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOG_LEVEL"   enum:"trace,debug,info,warn,error,fatal"`
+	Config   string `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH" short:"C"`
+	LogLevel string `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOG_LEVEL"             enum:"trace,debug,info,warn,error,fatal"`
 }
 
 type CLI struct {
 	CLIConfig  CLIConfig          `embed:"" help:"CLI configuration"  group:"CLI"`
 	VBANConfig vbantxt.VBANConfig `embed:"" help:"VBAN configuration" group:"VBAN"`
 
+	Man     ManFlag     `help:"Print man page."`
 	Version VersionFlag `help:"Print vbantxt version information and quit" name:"version" short:"v"`
 
 	RawCmd `cmd:"" help:"Send raw VBAN-TXT payload(s)."`
@@ -115,7 +133,9 @@ func buildInitialParser(pre *CLI) (*kong.Kong, error) {
 }
 
 func extractConfigPath(parser *kong.Kong, pre *CLI) string {
-	parser.Parse(os.Args[1:])
+	if _, err := parser.Parse(os.Args[1:]); err != nil {
+		return "vbantxt.toml"
+	}
 	return pre.CLIConfig.Config
 }
 

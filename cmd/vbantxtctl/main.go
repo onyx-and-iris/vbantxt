@@ -13,6 +13,8 @@ import (
 
 	"github.com/alecthomas/kong"
 	kongtoml "github.com/alecthomas/kong-toml"
+	mangokong "github.com/alecthomas/mango-kong"
+	"github.com/muesli/roff"
 
 	"github.com/onyx-and-iris/vbantxt"
 	"github.com/onyx-and-iris/vbantxt/internal/logging"
@@ -26,11 +28,26 @@ type VersionFlag string
 func (v VersionFlag) Decode(_ *kong.DecodeContext) error { return nil }  // nolint: revive
 func (v VersionFlag) IsBool() bool                       { return true } // nolint: revive
 func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error { // nolint: revive, unparam
-	if _, ok := vars["version"]; !ok {
+	if app.Model.Name != "vbantxtctl" {
 		return nil
 	}
 
 	fmt.Printf("vbantxtctl version: %s\n", vars["version"])
+	app.Exit(0)
+	return nil
+}
+
+type ManFlag mangokong.ManFlag
+
+func (m ManFlag) Decode(_ *kong.DecodeContext) error { return nil }  // nolint: revive
+func (m ManFlag) IsBool() bool                       { return true } // nolint: revive
+func (m ManFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error { // nolint: revive, unparam
+	if app.Model.Name != "vbantxtctl" {
+		return nil
+	}
+
+	man := mangokong.NewManPage(1, app.Model)
+	fmt.Fprint(app.Stdout, man.Build(roff.NewDocument()))
 	app.Exit(0)
 	return nil
 }
@@ -52,6 +69,7 @@ type CLI struct {
 	CLIConfig  CLIConfig          `embed:"" help:"CLI configuration"  group:"CLI"`
 	VBANConfig vbantxt.VBANConfig `embed:"" help:"VBAN configuration" group:"VBAN"`
 
+	Man     ManFlag     `help:"Print man page."`
 	Version VersionFlag `help:"Print vbantxtctl version information and quit" name:"version" short:"v"`
 
 	Raw RawCmd `cmd:"" help:"Send raw VBAN-TXT payload."`
@@ -125,7 +143,9 @@ func buildInitialParser(pre *CLI) (*kong.Kong, error) {
 }
 
 func extractConfigPath(parser *kong.Kong, pre *CLI) string {
-	parser.Parse(os.Args[1:])
+	if _, err := parser.Parse(os.Args[1:]); err != nil {
+		return "vbantxt.toml"
+	}
 	return pre.CLIConfig.Config
 }
 

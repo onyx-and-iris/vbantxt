@@ -5,6 +5,7 @@ A VBAN-TXT command-line interface supporting RT packets
 
 Flags:
   -h, --help       Show context-sensitive help.
+      --man        Print man page.
   -v, --version    Print vbantxtctl version information and quit
 
 CLI
