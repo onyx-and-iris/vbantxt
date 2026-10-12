@@ -23,6 +23,8 @@ type BusMuteCmd struct {
 
 // Run executes the BusMuteCmd command, either retrieving the current mute state of the bus or setting it based on the provided argument.
 func (cmd *BusMuteCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
+	idx := bus.Index.Index
+
 	if cmd.State == nil {
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSZero)
 		if err != nil {
@@ -30,23 +32,19 @@ func (cmd *BusMuteCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		}
 
 		p := pkt.(*packet.VbanRTPacketNBS0)
-		if p.States().Bus[bus.Index.Index].Mute() {
-			fmt.Fprintf(ctx.Out, "Bus %d is muted\n", bus.Index.Index)
-		} else {
-			fmt.Fprintf(ctx.Out, "Bus %d is unmuted\n", bus.Index.Index)
-		}
+		v := p.States().Bus[idx].Mute()
+		fmt.Fprintf(ctx.Out, "bus %d mute: %t\n", idx, v)
 		return nil
 	}
 
 	var val int
 	if *cmd.State == "true" {
 		val = 1
-	} else {
-		val = 0
 	}
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].mute=%d", bus.Index.Index, val)); err != nil {
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].mute=%d", idx, val)); err != nil {
 		return fmt.Errorf("failed to set mute state: %w", err)
 	}
-	fmt.Fprintf(ctx.Out, "Bus %d mute set: %s\n", bus.Index.Index, *cmd.State)
+	fmt.Fprintf(ctx.Out, "bus %d mute set: %t\n", idx, *cmd.State == "true")
 	return nil
 }

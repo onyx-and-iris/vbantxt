@@ -30,7 +30,7 @@ func (cmd *StripEqOnCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		p := pkt.(*packet.VbanRTPacketNBS0)
 		on := p.States().Strip[idx].EQOn()
 
-		fmt.Fprintf(ctx.Out, "strip[%d] EQ is %v\n", idx, on)
+		fmt.Fprintf(ctx.Out, "strip %d eq.on: %t\n", idx, on)
 		return nil
 	}
 
@@ -41,10 +41,10 @@ func (cmd *StripEqOnCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 
 	txt := fmt.Sprintf("strip[%d].eq.on=%d", idx, val)
 	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
-		return fmt.Errorf("failed to set EQ state: %w", err)
+		return fmt.Errorf("failed to set eq.on state: %w", err)
 	}
 
-	fmt.Fprintf(ctx.Out, "strip[%d] EQ set: %s\n", idx, *cmd.State)
+	fmt.Fprintf(ctx.Out, "strip %d eq.on set: %s\n", idx, *cmd.State)
 	return nil
 }
 
@@ -97,7 +97,7 @@ func (cmd *StripEqCellOnCmd) Run(
 
 		fmt.Fprintf(
 			ctx.Out,
-			"strip[%d] EQ channel %d cell %d is %v\n",
+			"strip %d eq channel %d cell %d on: %t\n",
 			idx,
 			ch.Index.Index,
 			cell.Index.Index,
@@ -122,11 +122,11 @@ func (cmd *StripEqCellOnCmd) Run(
 
 	fmt.Fprintf(
 		ctx.Out,
-		"strip[%d] EQ channel %d cell %d on state set: %s\n",
+		"strip %d eq channel %d cell %d on set: %t\n",
 		idx,
 		ch.Index.Index,
 		cell.Index.Index,
-		*cmd.State,
+		*cmd.State == "true",
 	)
 	return nil
 }

@@ -30,7 +30,7 @@ func (cmd *BusEqOnCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		p := pkt.(*packet.VbanRTPacketNBS0)
 		on := p.States().Bus[idx].EQOn()
 
-		fmt.Fprintf(ctx.Out, "bus[%d] EQ is %v\n", idx, on)
+		fmt.Fprintf(ctx.Out, "bus %d eq.on: %t\n", idx, on)
 		return nil
 	}
 
@@ -41,10 +41,10 @@ func (cmd *BusEqOnCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 
 	txt := fmt.Sprintf("bus[%d].eq.on=%d", idx, val)
 	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
-		return fmt.Errorf("failed to set EQ state: %w", err)
+		return fmt.Errorf("failed to set eq.on state: %w", err)
 	}
 
-	fmt.Fprintf(ctx.Out, "bus[%d] EQ set: %s\n", idx, *cmd.State)
+	fmt.Fprintf(ctx.Out, "bus %d eq.on set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
 
@@ -83,7 +83,7 @@ func (cmd *BusEqCellOnCmd) Run(
 	idx := bus.Index.Index
 
 	if cmd.State == nil {
-		return fmt.Errorf("bus EQ channel cell queries are not supported")
+		return fmt.Errorf("bus eq channel cell queries are not supported")
 	}
 
 	var val int
@@ -97,16 +97,16 @@ func (cmd *BusEqCellOnCmd) Run(
 	)
 
 	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
-		return fmt.Errorf("failed to set EQ cell on/off: %w", err)
+		return fmt.Errorf("failed to set EQ cell on: %w", err)
 	}
 
 	fmt.Fprintf(
 		ctx.Out,
-		"bus[%d] EQ channel %d cell %d on state set: %s\n",
+		"bus %d eq channel %d cell %d on set: %t\n",
 		idx,
 		ch.Index.Index,
 		cell.Index.Index,
-		*cmd.State,
+		*cmd.State == "true",
 	)
 	return nil
 }
