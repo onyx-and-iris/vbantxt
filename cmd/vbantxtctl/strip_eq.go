@@ -70,7 +70,7 @@ type StripEqChannelCellCmd struct {
 
 // StripEqCellOnCmd defines the command for getting or setting the on/off state of a specific EQ channel cell of a strip.
 type StripEqCellOnCmd struct {
-	State *string `arg:"" optional:"" enum:"true,false"`
+	State *string `arg:"" optional:"" enum:"true,false" help:"On/off state of the EQ cell."`
 }
 
 // Run executes the StripEqCellOnCmd command, either retrieving the current on/off state of the EQ cell or setting it based on the provided argument.
@@ -132,13 +132,225 @@ func (cmd *StripEqCellOnCmd) Run(
 }
 
 // StripEqCellTypeCmd defines the command for getting or setting the type of a specific EQ channel cell of a strip.
-type StripEqCellTypeCmd struct{ State *string }
+type StripEqCellTypeCmd struct {
+	State *int `arg:"" optional:"" help:"Type of the EQ cell." enum:"true,false"`
+}
+
+func (cmd *StripEqCellTypeCmd) Run(
+	ctx *appContext,
+	strip *StripCmdGroup,
+	ch *StripEqChannelCmd,
+	cell *StripEqChannelCellCmd,
+) error {
+	idx := strip.Index.Index
+
+	if cmd.State == nil {
+		if ch.Index.Index != 0 {
+			return fmt.Errorf("only EQ channel 0 is supported")
+		}
+
+		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		if err != nil {
+			return err
+		}
+
+		p := pkt.(*packet.VbanRTPacketNBS1)
+		t := p.Strip[idx].PEQ_Type[cell.Index.Index]
+		fmt.Fprintf(
+			ctx.Out,
+			"strip %d eq channel %d cell %d type: %d\n",
+			idx,
+			ch.Index.Index,
+			cell.Index.Index,
+			t,
+		)
+		return nil
+	}
+
+	txt := fmt.Sprintf(
+		"strip[%d].eq.channel[%d].cell[%d].type=%d",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell type: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"strip %d eq channel %d cell %d type set: %d\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // StripEqCellFreqCmd defines the command for getting or setting the frequency of a specific EQ channel cell of a strip.
-type StripEqCellFreqCmd struct{ State *float64 }
+type StripEqCellFreqCmd struct {
+	State *float64 `arg:"" optional:"" help:"Frequency of the EQ cell."`
+}
+
+func (cmd *StripEqCellFreqCmd) Run(
+	ctx *appContext,
+	strip *StripCmdGroup,
+	ch *StripEqChannelCmd,
+	cell *StripEqChannelCellCmd,
+) error {
+	idx := strip.Index.Index
+
+	if cmd.State == nil {
+		if ch.Index.Index != 0 {
+			return fmt.Errorf("only EQ channel 0 is supported")
+		}
+
+		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		if err != nil {
+			return err
+		}
+
+		p := pkt.(*packet.VbanRTPacketNBS1)
+		f := p.Strip[idx].PEQ_Freq[cell.Index.Index]
+		fmt.Fprintf(
+			ctx.Out,
+			"strip %d eq channel %d cell %d frequency: %f\n",
+			idx,
+			ch.Index.Index,
+			cell.Index.Index,
+			f,
+		)
+		return nil
+	}
+
+	txt := fmt.Sprintf(
+		"strip[%d].eq.channel[%d].cell[%d].freq=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell frequency: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"strip %d eq channel %d cell %d frequency set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // StripEqCellGainCmd defines the command for getting or setting the gain of a specific EQ channel cell of a strip.
-type StripEqCellGainCmd struct{ State *float64 }
+type StripEqCellGainCmd struct {
+	State *float64 `arg:"" optional:"" help:"Gain of the EQ cell."`
+}
+
+func (cmd *StripEqCellGainCmd) Run(
+	ctx *appContext,
+	strip *StripCmdGroup,
+	ch *StripEqChannelCmd,
+	cell *StripEqChannelCellCmd,
+) error {
+	idx := strip.Index.Index
+
+	if cmd.State == nil {
+		if ch.Index.Index != 0 {
+			return fmt.Errorf("only EQ channel 0 is supported")
+		}
+
+		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		if err != nil {
+			return err
+		}
+
+		p := pkt.(*packet.VbanRTPacketNBS1)
+		g := p.Strip[idx].PEQ_Gain[cell.Index.Index]
+		fmt.Fprintf(
+			ctx.Out,
+			"strip %d eq channel %d cell %d gain: %f\n",
+			idx,
+			ch.Index.Index,
+			cell.Index.Index,
+			g,
+		)
+		return nil
+	}
+
+	txt := fmt.Sprintf(
+		"strip[%d].eq.channel[%d].cell[%d].gain=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell gain: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"strip %d eq channel %d cell %d gain set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // StripEqCellQCmd defines the command for getting or setting the Q factor of a specific EQ channel cell of a strip.
-type StripEqCellQCmd struct{ State *float64 }
+type StripEqCellQCmd struct {
+	State *float64 `arg:"" optional:"" help:"Q factor of the EQ cell."`
+}
+
+func (cmd *StripEqCellQCmd) Run(
+	ctx *appContext,
+	strip *StripCmdGroup,
+	ch *StripEqChannelCmd,
+	cell *StripEqChannelCellCmd,
+) error {
+	idx := strip.Index.Index
+
+	if cmd.State == nil {
+		if ch.Index.Index != 0 {
+			return fmt.Errorf("only EQ channel 0 is supported")
+		}
+
+		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		if err != nil {
+			return err
+		}
+
+		p := pkt.(*packet.VbanRTPacketNBS1)
+		q := p.Strip[idx].PEQ_Q[cell.Index.Index]
+		fmt.Fprintf(
+			ctx.Out,
+			"strip %d eq channel %d cell %d Q factor: %f\n",
+			idx,
+			ch.Index.Index,
+			cell.Index.Index,
+			q,
+		)
+		return nil
+	}
+
+	txt := fmt.Sprintf(
+		"strip[%d].eq.channel[%d].cell[%d].q=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell Q factor: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"strip %d eq channel %d cell %d Q factor set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}

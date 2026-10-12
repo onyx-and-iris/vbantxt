@@ -83,7 +83,7 @@ func (cmd *BusEqCellOnCmd) Run(
 	idx := bus.Index.Index
 
 	if cmd.State == nil {
-		return fmt.Errorf("bus eq channel cell queries are not supported")
+		return fmt.Errorf("bus eq channel cell on queries are not supported")
 	}
 
 	var val int
@@ -112,13 +112,149 @@ func (cmd *BusEqCellOnCmd) Run(
 }
 
 // BusEqCellTypeCmd defines the command for getting or setting the type of a specific EQ channel cell of a bus.
-type BusEqCellTypeCmd struct{ State *string }
+type BusEqCellTypeCmd struct {
+	State *string
+}
+
+func (cmd *BusEqCellTypeCmd) Run(
+	ctx *appContext,
+	bus *BusCmdGroup,
+	ch *BusEqChannelCmd,
+	cell *BusEqChannelCellCmd,
+) error {
+	idx := bus.Index.Index
+
+	if cmd.State == nil {
+		return fmt.Errorf("bus eq channel cell type queries are not supported")
+	}
+
+	txt := fmt.Sprintf(
+		"bus[%d].eq.channel[%d].cell[%d].type=%s",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell type: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"bus %d eq channel %d cell %d type set: %s\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // BusEqCellFreqCmd defines the command for getting or setting the frequency of a specific EQ channel cell of a bus.
-type BusEqCellFreqCmd struct{ State *float64 }
+type BusEqCellFreqCmd struct {
+	State *float64
+}
+
+func (cmd *BusEqCellFreqCmd) Run(
+	ctx *appContext,
+	bus *BusCmdGroup,
+	ch *BusEqChannelCmd,
+	cell *BusEqChannelCellCmd,
+) error {
+	idx := bus.Index.Index
+
+	if cmd.State == nil {
+		return fmt.Errorf("bus eq channel cell frequency queries are not supported")
+	}
+
+	txt := fmt.Sprintf(
+		"bus[%d].eq.channel[%d].cell[%d].freq=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell frequency: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"bus %d eq channel %d cell %d frequency set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // BusEqCellGainCmd defines the command for getting or setting the gain of a specific EQ channel cell of a bus.
-type BusEqCellGainCmd struct{ State *float64 }
+type BusEqCellGainCmd struct {
+	State *float64
+}
+
+func (cmd *BusEqCellGainCmd) Run(
+	ctx *appContext,
+	bus *BusCmdGroup,
+	ch *BusEqChannelCmd,
+	cell *BusEqChannelCellCmd,
+) error {
+	idx := bus.Index.Index
+
+	if cmd.State == nil {
+		return fmt.Errorf("bus eq channel cell gain queries are not supported")
+	}
+
+	txt := fmt.Sprintf(
+		"bus[%d].eq.channel[%d].cell[%d].gain=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell gain: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"bus %d eq channel %d cell %d gain set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
 
 // BusEqCellQCmd defines the command for getting or setting the Q factor of a specific EQ channel cell of a bus.
-type BusEqCellQCmd struct{ State *float64 }
+type BusEqCellQCmd struct {
+	State *float64
+}
+
+func (cmd *BusEqCellQCmd) Run(
+	ctx *appContext,
+	bus *BusCmdGroup,
+	ch *BusEqChannelCmd,
+	cell *BusEqChannelCellCmd,
+) error {
+	idx := bus.Index.Index
+
+	if cmd.State == nil {
+		return fmt.Errorf("bus eq channel cell Q factor queries are not supported")
+	}
+
+	txt := fmt.Sprintf(
+		"bus[%d].eq.channel[%d].cell[%d].q=%f",
+		idx, ch.Index.Index, cell.Index.Index, *cmd.State,
+	)
+
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
+		return fmt.Errorf("failed to set EQ cell Q factor: %w", err)
+	}
+
+	fmt.Fprintf(
+		ctx.Out,
+		"bus %d eq channel %d cell %d Q factor set: %f\n",
+		idx,
+		ch.Index.Index,
+		cell.Index.Index,
+		*cmd.State,
+	)
+	return nil
+}
