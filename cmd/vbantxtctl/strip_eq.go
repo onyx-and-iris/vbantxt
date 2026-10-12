@@ -84,7 +84,7 @@ func (cmd *StripEqCellOnCmd) Run(
 
 	if cmd.State == nil {
 		if ch.Index.Index != 0 {
-			return fmt.Errorf("only EQ channel 0 is supported")
+			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
@@ -146,7 +146,7 @@ func (cmd *StripEqCellTypeCmd) Run(
 
 	if cmd.State == nil {
 		if ch.Index.Index != 0 {
-			return fmt.Errorf("only EQ channel 0 is supported")
+			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
@@ -202,7 +202,7 @@ func (cmd *StripEqCellFreqCmd) Run(
 
 	if cmd.State == nil {
 		if ch.Index.Index != 0 {
-			return fmt.Errorf("only EQ channel 0 is supported")
+			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
@@ -258,7 +258,7 @@ func (cmd *StripEqCellGainCmd) Run(
 
 	if cmd.State == nil {
 		if ch.Index.Index != 0 {
-			return fmt.Errorf("only EQ channel 0 is supported")
+			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
@@ -314,7 +314,7 @@ func (cmd *StripEqCellQCmd) Run(
 
 	if cmd.State == nil {
 		if ch.Index.Index != 0 {
-			return fmt.Errorf("only EQ channel 0 is supported")
+			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
 		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
