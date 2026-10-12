@@ -26,6 +26,8 @@ type StripCmdGroup struct {
 		B3 StripB3Cmd `cmd:""       help:"Get or set the B3 state of the strip." name:"b3"`
 
 		Eq StripEqCmdGroup `cmd:"" help:"Get or set the EQ settings of the strip."`
+
+		Gainlayer GainLayerCmdGroup `cmd:"" help:"Get or set the gain layer settings of the strip."`
 	} `arg:"" help:"Control a specific strip by index."`
 }
 
