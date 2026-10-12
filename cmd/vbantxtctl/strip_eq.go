@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/onyx-and-iris/vbantxt/packet"
@@ -22,7 +23,10 @@ func (cmd *StripEqOnCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSZero)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSZero)
 		if err != nil {
 			return err
 		}
@@ -87,7 +91,10 @@ func (cmd *StripEqCellOnCmd) Run(
 			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -149,7 +156,10 @@ func (cmd *StripEqCellTypeCmd) Run(
 			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -205,7 +215,10 @@ func (cmd *StripEqCellFreqCmd) Run(
 			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -261,7 +274,10 @@ func (cmd *StripEqCellGainCmd) Run(
 			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -317,7 +333,10 @@ func (cmd *StripEqCellQCmd) Run(
 			return fmt.Errorf("only EQ channel 0 queries are supported")
 		}
 
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}

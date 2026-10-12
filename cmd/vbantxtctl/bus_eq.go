@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/onyx-and-iris/vbantxt/packet"
@@ -22,7 +23,10 @@ func (cmd *BusEqOnCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 	idx := bus.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSZero)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSZero)
 		if err != nil {
 			return err
 		}

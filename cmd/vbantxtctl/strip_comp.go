@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/onyx-and-iris/vbantxt/packet"
@@ -26,7 +27,10 @@ func (cmd *StripCompKnobCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -55,7 +59,10 @@ func (cmd *StripCompInputGainCmd) Run(ctx *appContext, strip *StripCmdGroup) err
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -84,7 +91,10 @@ func (cmd *StripCompRatioCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -113,7 +123,10 @@ func (cmd *StripCompThresholdCmd) Run(ctx *appContext, strip *StripCmdGroup) err
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -142,7 +155,10 @@ func (cmd *StripCompAttackCmd) Run(ctx *appContext, strip *StripCmdGroup) error 
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -171,7 +187,10 @@ func (cmd *StripCompReleaseCmd) Run(ctx *appContext, strip *StripCmdGroup) error
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -200,7 +219,10 @@ func (cmd *StripCompKneeCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -229,7 +251,10 @@ func (cmd *StripCompOutputGainCmd) Run(ctx *appContext, strip *StripCmdGroup) er
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -258,7 +283,10 @@ func (cmd *StripCompMakeupCmd) Run(ctx *appContext, strip *StripCmdGroup) error 
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/onyx-and-iris/vbantxt/packet"
@@ -24,7 +25,10 @@ func (cmd *StripGateKnobCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -53,7 +57,10 @@ func (cmd *StripGateThresholdCmd) Run(ctx *appContext, strip *StripCmdGroup) err
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -82,7 +89,10 @@ func (cmd *StripGateDampingMaxCmd) Run(ctx *appContext, strip *StripCmdGroup) er
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -111,7 +121,10 @@ func (cmd *StripGateBPSidechainCmd) Run(ctx *appContext, strip *StripCmdGroup) e
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -140,7 +153,10 @@ func (cmd *StripGateAttackCmd) Run(ctx *appContext, strip *StripCmdGroup) error 
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -169,7 +185,10 @@ func (cmd *StripGateHoldCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -198,7 +217,10 @@ func (cmd *StripGateReleaseCmd) Run(ctx *appContext, strip *StripCmdGroup) error
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}

@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"os/signal"
+	"time"
 
 	"github.com/alecthomas/kong"
 	kongtoml "github.com/alecthomas/kong-toml"
@@ -14,14 +16,16 @@ import (
 )
 
 type appContext struct {
-	Ctx    context.Context
-	Client *vbantxt.Client
-	Out    io.Writer
+	Ctx     context.Context
+	Client  *vbantxt.Client
+	Out     io.Writer
+	Timeout time.Duration
 }
 
 type CLIConfig struct {
-	Config   string `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH"`
-	LogLevel string `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOGLEVEL"    enum:"trace,debug,info,warn,error,fatal"`
+	Config   string        `flag:"" default:"vbantxt.toml" help:"Path to the CLI configuration file." env:"VBANTXT_CLI_CONFIG_PATH"`
+	Timeout  time.Duration `flag:"" default:"2s"           help:"Timeout for RT operations."`
+	LogLevel string        `flag:"" default:"info"         help:"Log level for the CLI."              env:"VBANTXT_CLI_LOG_LEVEL"   enum:"trace,debug,info,warn,error,fatal"`
 }
 
 type CLI struct {
@@ -79,22 +83,30 @@ func run(ctx *kong.Context, cliConfig CLIConfig, vbanConfig vbantxt.VBANConfig) 
 	}
 	logging.SetLevel(loglevel)
 
-	client, err := initialise(vbanConfig)
+	rootCtx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	client, err := createClient(vbanConfig)
 	if err != nil {
 		return err
 	}
 	defer client.Close()
 
+	if err := client.Start(rootCtx); err != nil {
+		return err
+	}
+
 	ctx.Bind(&appContext{
-		Ctx:    context.Background(),
-		Client: client,
-		Out:    ctx.Stdout,
+		Ctx:     rootCtx,
+		Client:  client,
+		Out:     ctx.Stdout,
+		Timeout: cliConfig.Timeout,
 	})
 
 	return ctx.Run()
 }
 
-func initialise(cfg vbantxt.VBANConfig) (*vbantxt.Client, error) {
+func createClient(cfg vbantxt.VBANConfig) (*vbantxt.Client, error) {
 	client, err := vbantxt.New(
 		cfg.Host,
 		cfg.Port,
@@ -104,10 +116,6 @@ func initialise(cfg vbantxt.VBANConfig) (*vbantxt.Client, error) {
 		vbantxt.WithChannel(cfg.Channel),
 	)
 	if err != nil {
-		return nil, err
-	}
-
-	if err := client.Start(context.Background()); err != nil {
 		return nil, err
 	}
 

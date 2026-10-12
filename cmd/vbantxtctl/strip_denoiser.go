@@ -1,6 +1,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/onyx-and-iris/vbantxt/packet"
@@ -19,7 +20,10 @@ func (cmd *StripDenoiserKnobCmd) Run(ctx *appContext, strip *StripCmdGroup) erro
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
@@ -48,7 +52,10 @@ func (cmd *StripDenoiserThresholdCmd) Run(ctx *appContext, strip *StripCmdGroup)
 	idx := strip.Index.Index
 
 	if cmd.State == nil {
-		pkt, err := ctx.Client.WaitForRT(ctx.Ctx, packet.NBSOne)
+		opCtx, cancel := context.WithTimeout(ctx.Ctx, ctx.Timeout)
+		defer cancel()
+
+		pkt, err := ctx.Client.WaitForRT(opCtx, packet.NBSOne)
 		if err != nil {
 			return err
 		}
