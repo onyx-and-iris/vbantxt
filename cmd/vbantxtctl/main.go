@@ -46,7 +46,7 @@ func main() {
 	var cli CLI
 
 	initialParser, _ := buildInitialParser(&cli)
-	configFromCLI, _ := extractConfigPath(initialParser, &cli)
+	configFromCLI := extractConfigPath(initialParser, &cli)
 
 	ctx := kong.Parse(
 		&cli,
@@ -67,11 +67,9 @@ func buildInitialParser(pre *CLI) (*kong.Kong, error) {
 	)
 }
 
-func extractConfigPath(parser *kong.Kong, pre *CLI) (string, error) {
-	if _, err := parser.Parse(os.Args[1:]); err != nil {
-		return pre.CLIConfig.Config, fmt.Errorf("failed to parse CLI arguments: %w", err)
-	}
-	return pre.CLIConfig.Config, nil
+func extractConfigPath(parser *kong.Kong, pre *CLI) string {
+	parser.Parse(os.Args[1:])
+	return pre.CLIConfig.Config
 }
 
 func run(ctx *kong.Context, cliConfig CLIConfig, vbanConfig vbantxt.VBANConfig) error {
