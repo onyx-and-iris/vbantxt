@@ -6,12 +6,13 @@ import (
 	"github.com/onyx-and-iris/vbantxt/internal/packet"
 )
 
+// StripCmdGroup defines the command group for controlling a specific strip, including its mute state and EQ settings.
 type StripCmdGroup struct {
 	Index struct {
 		Index int          `arg:"" help:"The index of the strip. (0-based indexing)"`
 		Mute  StripMuteCmd `cmd:""       help:"Get or set the mute state of the strip."`
 
-		Eq EqCmdGroup `cmd:"" help:"Get or set the EQ settings of the strip."`
+		Eq StripEqCmdGroup `cmd:"" help:"Get or set the EQ settings of the strip."`
 	} `arg:"" help:"Control a specific strip by index."`
 }
 
@@ -37,13 +38,13 @@ func (cmd *StripMuteCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		return nil
 	}
 
-	var muteValue int
+	var val int
 	if *cmd.State == "true" {
-		muteValue = 1
+		val = 1
 	} else {
-		muteValue = 0
+		val = 0
 	}
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].mute=%d", strip.Index.Index, muteValue)); err != nil {
+	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].mute=%d", strip.Index.Index, val)); err != nil {
 		return fmt.Errorf("failed to set mute state: %w", err)
 	}
 	fmt.Fprintf(ctx.Out, "Strip %d mute set: %s\n", strip.Index.Index, *cmd.State)

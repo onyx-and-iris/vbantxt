@@ -31,6 +31,7 @@ type CLI struct {
 	Raw RawCmd `cmd:"" help:"Send raw VBAN-TXT payload."`
 
 	Strip StripCmdGroup `help:"Control the strips." group:"Strip" cmd:""`
+	Bus   BusCmdGroup   `help:"Control the buses."  group:"Bus"   cmd:""`
 }
 
 type RawCmd struct {
