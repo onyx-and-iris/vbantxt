@@ -201,17 +201,17 @@ func ParseVbanRTPacketNBS0(nbs NBS, data []byte) (*VbanRTPacketNBS0, error) {
 		layerSize    = 16
 	)
 
-	for layer := 0; layer < 8; layer++ {
+	for layer := range 8 {
 		offset := layer1Offset + layer*layerSize
 		raw := data[offset : offset+layerSize]
 
-		for strip := 0; strip < 8; strip++ {
+		for strip := range 8 {
 			v := int16(raw[strip*2]) | int16(raw[strip*2+1])<<8
 			p.StripGainLayer[layer][strip] = float64(v) * 0.01
 		}
 	}
 
-	for strip := 0; strip < 8; strip++ {
+	for strip := range 8 {
 		maxVal := p.StripGainLayer[0][strip]
 		for layer := 1; layer < 8; layer++ {
 			if p.StripGainLayer[layer][strip] > maxVal {
@@ -222,7 +222,7 @@ func ParseVbanRTPacketNBS0(nbs NBS, data []byte) (*VbanRTPacketNBS0, error) {
 	}
 
 	rawBusGain := data[436:452]
-	for bus := 0; bus < 8; bus++ {
+	for bus := range 8 {
 		v := int16(rawBusGain[bus*2]) | int16(rawBusGain[bus*2+1])<<8
 		p.BusGain[bus] = float64(v) * 0.01
 	}
