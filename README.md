@@ -37,35 +37,83 @@ For an outline of past/future changes refer to: [CHANGELOG](CHANGELOG.md)
 go get github.com/onyx-and-iris/vbantxt
 ```
 
+### SendTXT
+
 ```go
 package main
 
 import (
-	"log"
+    "log"
 
-	"github.com/onyx-and-iris/vbantxt"
+    "github.com/onyx-and-iris/vbantxt"
 )
 
 func main() {
-	var (
-		host       string = "vm.local"
-		port       int    = 6980
-		streamname string = "onyx"
-	)
+    client, err := vbantxt.New("vm.local", 6980, "onyx")
+    if err != nil {
+        log.Fatalf("failed to create client: %v", err)
+    }
+    defer client.Close()
 
-	client, err := vbantxt.New(host, port, streamname)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer client.Close()
-
-	err = client.Send("strip[0].mute=0")
-	if err != nil {
-		_, _ = fmt.Fprintf(os.Stderr, "Error: %s", err)
-		os.Exit(1)
-	}
+    if err := client.SendTXT("strip[0].mute=0"); err != nil {
+        log.Fatalf("failed to send TXT command: %v", err)
+    }
 }
 ```
+
+### SendTXT + RT
+
+```go
+package main
+
+import (
+    "context"
+    "fmt"
+    "log"
+    "time"
+
+    "github.com/onyx-and-iris/vbantxt"
+    "github.com/onyx-and-iris/vbantxt/packet"
+)
+
+func main() {
+    client, err := vbantxt.New("vm.local", 6980, "onyx")
+    if err != nil {
+        log.Fatalf("failed to create client: %v", err)
+    }
+    defer client.Close()
+
+    // Root context (can be cancelled on Ctrl‑C in real applications)
+    rootCtx := context.Background()
+
+    // Start subscriber + reader goroutines
+    if err := client.Start(rootCtx); err != nil {
+        log.Fatalf("failed to start client: %v", err)
+    }
+
+    if err := client.SendTXT(rootCtx, "strip[0].mute=0"); err != nil {
+        log.Fatalf("failed to send TXT command: %v", err)
+    }
+
+    // Operation context with timeout
+    opCtx, cancel := context.WithTimeout(rootCtx, 2*time.Second)
+    defer cancel()
+
+    // Wait for the next NBS0 packet
+    pkt, err := client.WaitForRT(opCtx, packet.NBSZero)
+    if err != nil {
+        log.Fatalf("failed to receive RT packet: %v", err)
+    }
+
+    // Read back the mute state
+    nbs0 := pkt.(*packet.VbanRTPacketNBS0)
+    muted := nbs0.States().Strip[0].Mute()
+
+    fmt.Printf("strip 0 mute: %v\n", muted)
+}
+```
+
+---
 
 ## `VBANTXT CLI`
 
@@ -83,40 +131,53 @@ Simply pass your vban commands as command line arguments:
 vbantxt "strip[0].mute=1 strip[1].mono=1"
 ```
 
+---
+
+## `VBANTXTCTL CLI`
+
+### Installation
+
+```console
+go install github.com/onyx-and-iris/vbantxt/cmd/vbantxtctl@latest
+```
+
+### Use
+
+Instead of raw string requests vbantxtcli uses a command tree parser.
+
+*set strip 0 mute*
+```console
+vbantxtctl strip 0 mute true
+```
+
+*read back value of strip 0 mute*
+```console
+vbantxtctl strip 0 mute
+```
+
+---
+
 ### Configuration
 
-#### Flags
+*vbantxt*
 
-```console
-FLAGS
-  -H, --host STRING         VBAN host (default: localhost)
-  -p, --port INT            VBAN port (default: 6980)
-  -s, --streamname STRING   VBAN stream name (default: Command1)
-  -b, --bps INT             VBAN BPS (default: 256000)
-  -n, --channel INT         VBAN channel (default: 0)
-  -r, --ratelimit INT       VBAN rate limit (ms) (default: 20)
-  -C, --config STRING       Path to the configuration file (default: $XDG_CONFIG_HOME/vbantxt/config.toml)
-  -l, --loglevel STRING     Log level (debug, info, warn, error, fatal, panic) (default: warn)
-  -v, --version             Show version information
-  -m, --man                 Print man page and exit
-```
+Please refer to [vbantxt-help](./tools/vbantxt-help.md)
 
-Pass --host, --port and --streamname as flags on the root command, for example:
+*vbantxtctl*
 
-```console
-vbantxt --host=localhost --port=6980 --streamname=Command1 --help
-```
+Please refer to [vbantxtctl-help](./tools/vbantxtctl-help.md)
+
 
 #### Environment Variables
 
-All flags have corresponding environment variables, prefixed with `VBANTXT_`:
+All flags have corresponding environment variables, prefixed with `VBANTXT_CLI_`:
 
 ```bash
 #!/usr/bin/env bash
 
-export VBANTXT_HOST=localhost
-export VBANTXT_PORT=6980
-export VBANTXT_STREAMNAME=Command1
+export VBANTXT_CLI_HOST=localhost
+export VBANTXT_CLI_PORT=6980
+export VBANTXT_CLI_STREAMNAME=Command1
 ```
 
 Flags will override environment variables.
@@ -176,10 +237,11 @@ vbantxt "Point(ASIO128.IN[2],ASIO128.OUT[1]).dBGain = -8"
 
 ## `Logging`
 
-The --loglevel/-l flag allows you to control the verbosity of the application's logging output. 
+The --log-level/-l flag allows you to control the verbosity of the application's logging output. 
 
 Acceptable values for this flag are:
 
+- `trace`
 - `debug`
 - `info`
 - `warn`
@@ -190,7 +252,7 @@ Acceptable values for this flag are:
 For example, to set the log level to `debug`, you can use:
 
 ```console
-vbantxt --loglevel=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
+vbantxt --log-level=debug "bus[0].eq.on=1 bus[1].gain=-12.8"
 ```
 
 The default log level is `warn` if the flag is not specified.
