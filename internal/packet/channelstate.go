@@ -54,3 +54,7 @@ func (c ChannelState) PanColor() bool { return (c.State & ChannelModePanColor) !
 func (c ChannelState) PanMod() bool   { return (c.State & ChannelModePanMod) != 0 }
 func (c ChannelState) Sel() bool      { return (c.State & ChannelModeSel) != 0 }
 func (c ChannelState) Monitor() bool  { return (c.State & ChannelModeMonitor) != 0 }
+
+func (c ChannelState) Mode() int {
+	return int((c.State & 0x000000F0) >> 4)
+}
