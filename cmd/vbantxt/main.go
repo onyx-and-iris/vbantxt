@@ -28,22 +28,30 @@ type CLI struct {
 	CLIConfig  CLIConfig          `embed:"" help:"CLI configuration"  group:"CLI"`
 	VBANConfig vbantxt.VBANConfig `embed:"" help:"VBAN configuration" group:"VBAN"`
 
-	RawCmd `arg:"" help:"Send raw VBAN-TXT payload."`
+	RawCmd `cmd:"" help:"Send raw VBAN-TXT payload(s)."`
 }
 
 type RawCmd struct {
-	Payload string `arg:"" help:"Raw VBAN-TXT payload"`
+	Payload []string `arg:"" help:"One or more raw VBAN-TXT payloads."`
 }
 
 func (cmd *RawCmd) Run(ctx *appContext) error {
-	return ctx.Client.SendTXT(ctx.Ctx, cmd.Payload)
+	for _, cmd := range cmd.Payload {
+		if err := ctx.Client.SendTXT(ctx.Ctx, cmd); err != nil {
+			logging.Errorf("Failed to send VBAN-TXT payload: %v", err)
+		}
+	}
+	return nil
 }
 
 func main() {
 	var cli CLI
 
 	initialParser, _ := buildInitialParser(&cli)
-	configFromCLI, _ := extractConfigPath(initialParser, &cli)
+	configFromCLI, err := extractConfigPath(initialParser, &cli)
+	if err != nil {
+		logging.Fatalf("Error extracting config path: %v", err)
+	}
 
 	ctx := kong.Parse(
 		&cli,
