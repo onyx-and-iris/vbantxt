@@ -6,6 +6,9 @@ import (
 	"io"
 	"os"
 	"os/signal"
+	"path/filepath"
+	"runtime/debug"
+	"strings"
 	"time"
 
 	"github.com/alecthomas/kong"
@@ -14,6 +17,23 @@ import (
 	"github.com/onyx-and-iris/vbantxt"
 	"github.com/onyx-and-iris/vbantxt/internal/logging"
 )
+
+var version string // Version of the CLI, set at build time.
+
+// VersionFlag is a custom flag type that prints the version and exits.
+type VersionFlag string
+
+func (v VersionFlag) Decode(_ *kong.DecodeContext) error { return nil }  // nolint: revive
+func (v VersionFlag) IsBool() bool                       { return true } // nolint: revive
+func (v VersionFlag) BeforeApply(app *kong.Kong, vars kong.Vars) error { // nolint: revive, unparam
+	if _, ok := vars["version"]; !ok {
+		return nil
+	}
+
+	fmt.Printf("vbantxtctl version: %s\n", vars["version"])
+	app.Exit(0)
+	return nil
+}
 
 type appContext struct {
 	Ctx     context.Context
@@ -31,6 +51,8 @@ type CLIConfig struct {
 type CLI struct {
 	CLIConfig  CLIConfig          `embed:"" help:"CLI configuration"  group:"CLI"`
 	VBANConfig vbantxt.VBANConfig `embed:"" help:"VBAN configuration" group:"VBAN"`
+
+	Version VersionFlag `help:"Print vbantxtctl version information and quit" name:"version" short:"v"`
 
 	Raw RawCmd `cmd:"" help:"Send raw VBAN-TXT payload."`
 
@@ -52,6 +74,13 @@ func (cmd *RawCmd) Run(ctx *appContext) error {
 }
 
 func main() {
+	configDir, err := os.UserConfigDir()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "failed to get user config directory: %v\n", err)
+		os.Exit(1)
+	}
+	defaultConfigPath := filepath.Join(configDir, "vbantxt", "config.toml")
+
 	var cli CLI
 
 	initialParser, _ := buildInitialParser(&cli)
@@ -59,7 +88,26 @@ func main() {
 
 	ctx := kong.Parse(
 		&cli,
-		kong.Configuration(kongtoml.Loader, configFromCLI, "/etc/vbantxt/app.toml"),
+		kong.Name("vbantxtctl"),
+		kong.Description("A VBAN-TXT command-line interface supporting RT packets"),
+		kong.UsageOnError(),
+		kong.ConfigureHelp(kong.HelpOptions{
+			Compact: true,
+		}),
+		kong.Vars{
+			"version": func() string {
+				if version != "" {
+					return version
+				}
+
+				info, ok := debug.ReadBuildInfo()
+				if !ok {
+					return "(unable to read version)"
+				}
+				return strings.Split(info.Main.Version, "-")[0]
+			}(),
+		},
+		kong.Configuration(kongtoml.Loader, defaultConfigPath, configFromCLI),
 	)
 
 	ctx.FatalIfErrorf(run(ctx, cli.CLIConfig, cli.VBANConfig))
@@ -67,8 +115,8 @@ func main() {
 
 func buildInitialParser(pre *CLI) (*kong.Kong, error) {
 	return kong.New(pre,
-		kong.Name("vbantxtctl"),
-		kong.Description("VBAN-TXT control CLI"),
+		kong.Name("pre"),
+		kong.Description("First pass parser"),
 		kong.Help(func(options kong.HelpOptions, ctx *kong.Context) error {
 			return nil
 		}),

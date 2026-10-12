@@ -38,6 +38,13 @@ type Client struct {
 // New creates a new Client instance with the specified host, port, and stream name.
 // It applies any provided options and returns the initialised client or an error if creation fails.
 func New(host string, port int, streamname string, options ...Option) (*Client, error) {
+	logging.Debugf(
+		"Creating VBAN-TXT client with host: %s, port: %d, streamname: %s",
+		host,
+		port,
+		streamname,
+	)
+
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
 		return nil, err

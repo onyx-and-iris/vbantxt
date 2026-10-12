@@ -1,11 +1,14 @@
 ```console
 Usage: vbantxt <payload> ... [flags]
 
+A VBAN-TXT command-line interface
+
 Arguments:
   <payload> ...    One or more raw VBAN-TXT payloads.
 
 Flags:
-  -h, --help    Show context-sensitive help.
+  -h, --help       Show context-sensitive help.
+  -v, --version    Print vbantxt version information and quit
 
 CLI
   --config="vbantxt.toml"    Path to the CLI configuration file ($VBANTXT_CLI_CONFIG_PATH).
