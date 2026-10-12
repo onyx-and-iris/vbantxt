@@ -1,0 +1,22 @@
+version: '3'
+
+vars:
+  WINDOWS: '{{.BIN_DIR}}/{{.PROGRAM}}_windows_amd64.exe'
+  LINUX: '{{.BIN_DIR}}/{{.PROGRAM}}_linux_amd64'
+  MACOS: '{{.BIN_DIR}}/{{.PROGRAM}}_darwin_amd64'
+
+tasks:
+  windows-amd64:
+    desc: Build the project for Windows
+    cmds:
+      - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}
+
+  linux-amd64:
+    desc: Build the project for Linux
+    cmds:
+      - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}
+
+  darwin-amd64:
+    desc: Build the project for macOS
+    cmds:
+      - GOOS=darwin GOARCH=amd64 go build -o {{.MACOS}} -ldflags="-X main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}

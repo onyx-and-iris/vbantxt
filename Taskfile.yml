@@ -1,18 +1,30 @@
 version: '3'
 
 includes:
-  man: Taskfile.man.yml
+  build-vbantxt:
+    taskfile: ./Taskfile.build.yml
+    internal: true
+    vars:
+      PROGRAM: vbantxt
+  build-vbantxtctl:
+    taskfile: ./Taskfile.build.yml
+    internal: true
+    vars:
+      PROGRAM: vbantxtctl
+  man-vbantxt:
+    taskfile: ./Taskfile.man.yml
+    vars:
+      PROGRAM: vbantxt
+  man-vbantxtctl:
+    taskfile: ./Taskfile.man.yml
+    vars:
+      PROGRAM: vbantxtctl
 
 vars:
-  PROGRAM: vbantxt
   SHELL: '{{if eq .OS "Windows_NT"}}powershell{{end}}'
   BIN_DIR: bin
   VERSION:
     sh: 'git describe --tags $(git rev-list --tags --max-count=1)'
-
-  WINDOWS: '{{.BIN_DIR}}/{{.PROGRAM}}_windows_amd64.exe'
-  LINUX: '{{.BIN_DIR}}/{{.PROGRAM}}_linux_amd64'
-  MACOS: '{{.BIN_DIR}}/{{.PROGRAM}}_darwin_amd64'
 
 tasks:
   default:
@@ -21,12 +33,15 @@ tasks:
       - task: build
 
   build:
-    desc: 'Build the vbantxt project'
+    desc: Build the vbantxt and vbantxtctl projects for all platforms
     deps: [vet]
     cmds:
-      - task: build-windows
-      - task: build-linux
-      - task: build-macos
+      - for:
+          matrix:
+            PROGRAM: ['build-vbantxt', 'build-vbantxtctl']
+            TARGET: ['windows-amd64', 'linux-amd64', 'darwin-amd64']
+        task: '{{.ITEM.PROGRAM}}:{{.ITEM.TARGET}}'
+
   vet:
     desc: Vet the code
     deps: [fmt]
@@ -37,27 +52,6 @@ tasks:
     desc: Fmt the code
     cmds:
       - go fmt ./...
-
-  build-windows:
-    desc: Build the vbantxt project for Windows
-    cmds:
-      - GOOS=windows GOARCH=amd64 go build -o {{.WINDOWS}} -ldflags="-X
-        main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
-    internal: true
-
-  build-linux:
-    desc: Build the vbantxt project for Linux
-    cmds:
-      - GOOS=linux GOARCH=amd64 go build -o {{.LINUX}} -ldflags="-X
-        main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
-    internal: true
-
-  build-macos:
-    desc: Build the vbantxt project for macOS
-    cmds:
-      - GOOS=darwin GOARCH=amd64 go build -o {{.MACOS}} -ldflags="-X
-        main.version={{.VERSION}}" ./cmd/{{.PROGRAM}}/
-    internal: true
 
   test:
     desc: Run tests
