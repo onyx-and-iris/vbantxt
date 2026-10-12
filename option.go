@@ -3,53 +3,46 @@ package vbantxt
 import (
 	"time"
 
-	"github.com/charmbracelet/log"
+	"github.com/onyx-and-iris/vbantxt/internal/logging"
+	"github.com/onyx-and-iris/vbantxt/internal/packet"
 )
 
 // Option is a functional option type that allows us to configure the VbanTxt.
-type Option func(*VbanTxt)
+type Option func(*Client)
 
 // WithRateLimit is a functional option to set the ratelimit for requests.
 func WithRateLimit(ratelimit time.Duration) Option {
-	return func(vt *VbanTxt) {
-		vt.ratelimit = ratelimit
+	return func(c *Client) {
+		c.rateLimit = ratelimit
 	}
 }
 
 // WithBPSOpt is a functional option to set the bps index for {VbanTxt}.packet.
 func WithBPSOpt(bps int) Option {
-	return func(vt *VbanTxt) {
-		defaultBps := BpsOpts[vt.packet.bpsIndex]
+	return func(c *Client) {
+		defaultBps := packet.BpsOpts[c.hdr.BPSIndex]
 
-		bpsIndex := indexOf(BpsOpts, bps)
-		if bpsIndex == -1 {
-			log.Warnf(
+		bpsIndex, err := packet.BpsIndex(bps)
+		if err != nil {
+			logging.Warnf(
 				"invalid bps value %d, expected one of %v, defaulting to %d",
 				bps,
-				BpsOpts,
+				packet.BpsOpts,
 				defaultBps,
 			)
 			return
 		}
-		if bpsIndex > 255 {
-			log.Warnf("bps index %d too large for uint8, defaulting to %d", bpsIndex, defaultBps)
-			return
-		}
-		vt.packet.bpsIndex = uint8(bpsIndex)
+		c.hdr.BPSIndex = uint8(bpsIndex)
 	}
 }
 
 // WithChannel is a functional option to set the channel for {VbanTxt}.packet.
 func WithChannel(channel int) Option {
-	return func(vt *VbanTxt) {
+	return func(c *Client) {
 		if channel < 0 || channel > 255 {
-			log.Warnf(
-				"channel value %d out of range [0,255], defaulting to %d",
-				channel,
-				vt.packet.channel,
-			)
+			logging.Warnf("channel value %d out of range [0,255], keeping default %d", channel, c.hdr.Channel)
 			return
 		}
-		vt.packet.channel = uint8(channel)
+		c.hdr.Channel = uint8(channel)
 	}
 }
