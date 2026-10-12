@@ -25,7 +25,10 @@ type StripCmdGroup struct {
 		B2 StripB2Cmd `cmd:""       help:"Get or set the B2 state of the strip." name:"b2"`
 		B3 StripB3Cmd `cmd:""       help:"Get or set the B3 state of the strip." name:"b3"`
 
-		Eq StripEqCmdGroup `cmd:"" help:"Get or set the EQ settings of the strip."`
+		Eq       StripEqCmdGroup       `cmd:"" help:"Get or set the EQ settings of the strip."`
+		Comp     StripCompCmdGroup     `cmd:"" help:"Get or set the compressor settings of the strip."`
+		Gate     StripGateCmdGroup     `cmd:"" help:"Get or set the gate settings of the strip."`
+		Denoiser StripDenoiserCmdGroup `cmd:"" help:"Get or set the denoiser settings of the strip."`
 
 		Gainlayer GainLayerCmdGroup `cmd:"" help:"Get or set the gain layer settings of the strip."`
 	} `arg:"" help:"Control a specific strip by index."`
