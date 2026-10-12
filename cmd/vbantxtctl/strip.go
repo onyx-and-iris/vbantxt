@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 // StripCmdGroup defines the command group for controlling a specific strip, including its mute state and EQ settings.

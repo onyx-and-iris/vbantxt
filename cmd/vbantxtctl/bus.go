@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 // BusCmdGroup defines the command group for controlling a specific bus, including its mute state and EQ settings.

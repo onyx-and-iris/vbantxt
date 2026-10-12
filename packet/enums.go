@@ -36,5 +36,7 @@ const (
 	NBSOne  NBS = 1
 )
 
-const HeaderSize = 28 // VBAN service header size
-const StreamnameMaxLength = 16
+const (
+	HeaderSize          = 28 // VBAN service header size.
+	StreamnameMaxLength = 16
+)

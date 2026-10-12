@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 type GainLayerCmdGroup struct {

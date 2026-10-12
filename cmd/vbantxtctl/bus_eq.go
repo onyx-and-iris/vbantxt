@@ -3,7 +3,7 @@ package main
 import (
 	"fmt"
 
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 // BusEqCmdGroup defines the command group for controlling the EQ settings of a specific bus.

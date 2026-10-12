@@ -2,14 +2,13 @@ package vbantxt
 
 import (
 	"context"
+	"fmt"
 	"net"
 	"sync"
 	"time"
 
-	"fmt"
-
 	"github.com/onyx-and-iris/vbantxt/internal/logging"
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 // Client represents a VBAN TXT client that communicates with a VBAN server over UDP.
@@ -37,7 +36,7 @@ type Client struct {
 }
 
 // New creates a new Client instance with the specified host, port, and stream name.
-// It applies any provided options and returns the initialized client or an error if creation fails.
+// It applies any provided options and returns the initialised client or an error if creation fails.
 func New(host string, port int, streamname string, options ...Option) (*Client, error) {
 	addr, err := net.ResolveUDPAddr("udp", fmt.Sprintf("%s:%d", host, port))
 	if err != nil {
@@ -75,7 +74,12 @@ func New(host string, port int, streamname string, options ...Option) (*Client, 
 	return c, nil
 }
 
-// Start initializes the client and starts the subscriber and reader goroutines.
+// Context returns the client's managed context.
+func (c *Client) Context() context.Context {
+	return c.ctx
+}
+
+// Start initialises the client and starts the subscriber and reader goroutines.
 // It returns an error if initialization fails.
 func (c *Client) Start(ctx context.Context) error {
 	// tie external ctx to internal

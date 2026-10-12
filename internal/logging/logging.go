@@ -17,10 +17,9 @@ const (
 	LevelFatal           = log.FatalLevel // 12
 )
 
-var (
-	traceLogger *log.Logger
-)
+var traceLogger *log.Logger
 
+// nolint: misspell
 func init() {
 	traceLogger = log.NewWithOptions(os.Stderr, log.Options{
 		Level:           LevelTrace,

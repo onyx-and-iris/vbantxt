@@ -4,7 +4,7 @@ import (
 	"time"
 
 	"github.com/onyx-and-iris/vbantxt/internal/logging"
-	"github.com/onyx-and-iris/vbantxt/internal/packet"
+	"github.com/onyx-and-iris/vbantxt/packet"
 )
 
 // Option is a functional option type that allows us to configure the VbanTxt.
@@ -40,7 +40,11 @@ func WithBPSOpt(bps int) Option {
 func WithChannel(channel int) Option {
 	return func(c *Client) {
 		if channel < 0 || channel > 255 {
-			logging.Warnf("channel value %d out of range [0,255], keeping default %d", channel, c.hdr.Channel)
+			logging.Warnf(
+				"channel value %d out of range [0,255], keeping default %d",
+				channel,
+				c.hdr.Channel,
+			)
 			return
 		}
 		c.hdr.Channel = uint8(channel)
