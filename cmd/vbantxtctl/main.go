@@ -46,10 +46,7 @@ func main() {
 	var cli CLI
 
 	initialParser, _ := buildInitialParser(&cli)
-	configFromCLI, err := extractConfigPath(initialParser, &cli)
-	if err != nil {
-		logging.Fatalf("Error extracting config path: %v", err)
-	}
+	configFromCLI, _ := extractConfigPath(initialParser, &cli)
 
 	ctx := kong.Parse(
 		&cli,
