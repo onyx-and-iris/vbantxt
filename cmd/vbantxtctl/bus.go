@@ -46,9 +46,11 @@ func (cmd *BusMonoCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].mono=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("bus[%d].mono=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set mono state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "bus %d mono set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -79,9 +81,11 @@ func (cmd *BusMuteCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].mute=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("bus[%d].mute=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set mute state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "bus %d mute set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -113,9 +117,11 @@ func (cmd *BusModeCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		return nil
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].mode.%s=1", idx, *cmd.State)); err != nil {
+	txt := fmt.Sprintf("bus[%d].mode.%s=1", idx, *cmd.State)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set mode: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "bus %d mode set: %s\n", idx, *cmd.State)
 	return nil
 }
@@ -145,6 +151,7 @@ func (cmd *BusGainCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set gain: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "bus %d gain set: %f\n", idx, *cmd.State)
 	return nil
 }
@@ -170,9 +177,11 @@ func (cmd *BusLabelCmd) Run(ctx *appContext, bus *BusCmdGroup) error {
 		return nil
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("bus[%d].label=\"%s\"", idx, *cmd.State)); err != nil {
+	txt := fmt.Sprintf("bus[%d].label=\"%s\"", idx, *cmd.State)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set label: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "bus %d label set: %s\n", idx, *cmd.State)
 	return nil
 }

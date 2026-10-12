@@ -55,9 +55,11 @@ func (cmd *StripMonoCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].mono=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].mono=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set mono state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d mono set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -88,9 +90,11 @@ func (cmd *StripSoloCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].solo=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].solo=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set solo state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d solo set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -121,9 +125,11 @@ func (cmd *StripMuteCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].mute=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].mute=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set mute state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d mute set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -152,6 +158,7 @@ func (cmd *StripGainCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set gain: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d gain set: %f\n", idx, *cmd.State)
 	return nil
 }
@@ -182,9 +189,11 @@ func (cmd *StripA1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].A1=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].A1=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set A1 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d A1 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -215,9 +224,11 @@ func (cmd *StripA2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].A2=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].A2=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set A2 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d A2 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -248,9 +259,11 @@ func (cmd *StripA3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].A3=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].A3=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set A3 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d A3 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -281,9 +294,11 @@ func (cmd *StripA4Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].A4=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].A4=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set A4 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d A4 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -314,9 +329,11 @@ func (cmd *StripA5Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].A5=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].A5=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set A5 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d A5 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -347,9 +364,11 @@ func (cmd *StripB1Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].B1=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].B1=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set B1 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d B1 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -380,9 +399,11 @@ func (cmd *StripB2Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].B2=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].B2=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set B2 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d B2 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -413,9 +434,11 @@ func (cmd *StripB3Cmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		val = 1
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].B3=%d", idx, val)); err != nil {
+	txt := fmt.Sprintf("strip[%d].B3=%d", idx, val)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set B3 state: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d B3 set: %t\n", idx, *cmd.State == "true")
 	return nil
 }
@@ -441,9 +464,11 @@ func (cmd *StripLabelCmd) Run(ctx *appContext, strip *StripCmdGroup) error {
 		return nil
 	}
 
-	if err := ctx.Client.SendTXT(ctx.Ctx, fmt.Sprintf("strip[%d].Label=\"%s\"", idx, *cmd.Label)); err != nil {
+	txt := fmt.Sprintf("strip[%d].Label=\"%s\"", idx, *cmd.Label)
+	if err := ctx.Client.SendTXT(ctx.Ctx, txt); err != nil {
 		return fmt.Errorf("failed to set label: %w", err)
 	}
+
 	fmt.Fprintf(ctx.Out, "strip %d label set: %s\n", idx, *cmd.Label)
 	return nil
 }

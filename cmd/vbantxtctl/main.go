@@ -6,11 +6,11 @@ import (
 	"io"
 	"os"
 
-	"github.com/onyx-and-iris/vbantxt"
-	"github.com/onyx-and-iris/vbantxt/internal/logging"
-
 	"github.com/alecthomas/kong"
 	kongtoml "github.com/alecthomas/kong-toml"
+
+	"github.com/onyx-and-iris/vbantxt"
+	"github.com/onyx-and-iris/vbantxt/internal/logging"
 )
 
 type appContext struct {
